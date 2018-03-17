@@ -18,8 +18,25 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 	std::string cmd(argv[1]);
+	if (cmd == "inverse")
+	{
+		Matrix a(4, 4);
+		rand_gen(a);
+		printf("== a ==\n");
+		a.print();
+		a = a.inverse();
+		printf("== a.inverse() ==\n");
+		a.print();
 
-	if (cmd == "construct")
+		Matrix b(3, 3);
+		rand_gen(b);
+		printf("== b ==\n");
+		b.print();
+		b = b.inverse();
+		printf("== b.inverse() ==\n");
+		b.print();
+	}
+	else if (cmd == "construct")
 	{
 		{
 			Matrix a(3, 4);
@@ -45,17 +62,12 @@ int main(int argc, char *argv[])
 	else if (cmd == "assign")
 	{
 		Matrix a(7, 3);
-		Matrix b(11, 5);
-		Matrix c(a);
 		rand_gen(a);
-		rand_gen(c);
-		b = a;
+		Matrix b(a);
+		printf("== a ==\n");
+		a.print();
+		printf("== b ==\n");
 		b.print();
-		b = c;
-		b.print();
-		c = b = a;
-		b.print();
-		c.print();
 	}
 	else if (cmd == "unary")
 	{
@@ -63,43 +75,36 @@ int main(int argc, char *argv[])
 		Matrix b(a);
 		rand_gen(a);
 		b = -a;
+		printf("== a ==\n");
 		a.print();
+		printf("== -a ==\n");
 		b.print();
-		Matrix c(+b);
-		a.print();
-		b.print();
-		c.print();
 	}
 	else if (cmd == "add")
 	{
 		Matrix a(11, 6);
-		Matrix b(a);
-		Matrix c(b);
 		rand_gen(a);
-		rand_gen(c);
+		Matrix b(a);
+		Matrix c(a);
+		c = a + b;
+		printf("== a ==\n");
 		a.print();
-		c.print();
-		b = a + c;
+		printf("== b ==\n");
 		b.print();
-		a = a + b;
-		a.print();
-		c = a + b + c;
+		printf("== a + b ==\n");
 		c.print();
 	}
 	else if (cmd == "subtract")
 	{
-		Matrix a(14, 3);
-		Matrix b(a);
-		Matrix c(b);
+		Matrix a(11, 6);
 		rand_gen(a);
-		rand_gen(c);
+		Matrix b(a);
+		rand_gen(b);
+		Matrix c(a);
+		c = a - b;
 		a.print();
-		c.print();
-		b = a - c;
 		b.print();
-		a = a - b;
-		a.print();
-		c = a - b - c;
+		printf("== a - b ==\n");
 		c.print();
 	}
 	else if (cmd == "mult")
@@ -110,35 +115,24 @@ int main(int argc, char *argv[])
 		Matrix d(b);
 		rand_gen(a);
 		rand_gen(b);
-		rand_gen(c);
-		rand_gen(d);
-		a.print();
-		b.print();
+		c = a * b;
+		d = b * a;
 		c.print();
 		d.print();
-		Matrix e(a * b);
-		e.print();
-		d = b * c * d;
-		d.print();
-		a = e * a * d;
-		a.print();
 	}
 	else if (cmd == "division")
 	{
 		Matrix a(5, 5);
-		Matrix b(a);
 		rand_gen(a);
-		rand_gen(b);
-		a.print();
+		Matrix b(a);
+		b = a / a;
 		b.print();
-		a = a / b;
-		a.print();
 	}
 	else if (cmd == "io")
 	{
 		Matrix a(7, 2);
 		Matrix b(3, 4);
-		std::string str = "itisamatrix";
+		std::string str = "itisamatrix.output";
 		rand_gen(a);
 		a.print();
 		b.print();

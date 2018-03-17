@@ -1,3 +1,4 @@
 *.exe
 *.out
 *.DS_Store
+*.output
