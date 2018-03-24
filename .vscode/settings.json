@@ -8,6 +8,13 @@
         "algorithm": "cpp",
         "map": "cpp",
         "string_view": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "__split_buffer": "cpp",
+        "initializer_list": "cpp",
+        "iterator": "cpp",
+        "vector": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "__locale": "cpp"
     }
 }
