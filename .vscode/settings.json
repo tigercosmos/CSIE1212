@@ -17,7 +17,12 @@
         "ostream": "cpp",
         "__locale": "cpp",
         "iosfwd": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "locale": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "bitset": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }

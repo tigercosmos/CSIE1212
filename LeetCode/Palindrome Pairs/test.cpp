@@ -1,9 +1,6 @@
 #include "./palindromePairs.cpp"
-#include <iostream>
-#include <string>
-using namespace std;
 
-void print(vector<vector<int>> v) {
+static void print(vector<vector<int>> v) {
   string s = "[";
   for (int i = 0; i < v.size(); i++) {
     s += "[";
@@ -18,7 +15,7 @@ void print(vector<vector<int>> v) {
   cout << s << endl;
 }
 
-void assert_equal(vector<vector<int>> v1, vector<vector<int>> v2) {
+static void assert_equal(vector<vector<int>> v1, vector<vector<int>> v2) {
   bool isEqual = false;
   if (v1 == v2) {
     isEqual = true;
