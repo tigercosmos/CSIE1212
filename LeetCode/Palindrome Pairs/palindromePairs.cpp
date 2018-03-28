@@ -8,8 +8,8 @@
   5. if the word is longer than the word in trie, check if the remainig
      of this word is palindrome.
 
-  Complexity O(N*k*k)
-  N for strings, each k for create and search k length string
+  Complexity O(N*k)
+  N for strings, each k for trie and find palindrome
 ************************************************************************/
 
 #include <algorithm>

@@ -1,7 +1,7 @@
 // First try with failure.
 // 101 / 134 test cases passed with TLE
 // N strings with k length
-// Complexity in O(k*N^2)
+// Complexity in O(k^2*N^2)
 
 #include <algorithm>
 #include <iostream>
