@@ -1,0 +1,17 @@
+os:
+  - linux
+  - osx
+
+language: cpp
+
+compiler:
+  - g++
+  - clang++
+
+script:
+  - sh ci.sh
+
+notifications:
+  email:
+    on_success: never
+    on_failure: never
