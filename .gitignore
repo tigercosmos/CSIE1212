@@ -2,3 +2,4 @@
 *.out
 *.DS_Store
 *.output
+!Course/HW2/test_data/*.out
