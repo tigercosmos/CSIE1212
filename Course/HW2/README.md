@@ -81,7 +81,7 @@ Dir Tree:
 ## Sample case:
 ```
 Input: query    20130114    Diamond    Tidex
-Output: 2.944    4.6044    24
+Output: 2.9440    4.6044    24
 ```
 
 ```
