@@ -108,7 +108,6 @@ int main(int argc, char *argv[]) {
   vector<Data> datum_query;
   vector<Data> datum_min;
   vector<Data> datum_max;
-  vector<Data> datum_cap;
 
   // input data from file and store in datum_query
   ifstream input(argv[1]);
@@ -120,26 +119,19 @@ int main(int argc, char *argv[]) {
   // copt vector to all vector
   datum_min.assign(datum_query.begin(), datum_query.end());
   datum_max.assign(datum_query.begin(), datum_query.end());
-  datum_cap.assign(datum_query.begin(), datum_query.end());
 
   // sort query
-  sort(datum_query.begin(), datum_query.end(), exchangeCmp);
   stable_sort(datum_query.begin(), datum_query.end(), currencyCmp);
   stable_sort(datum_query.begin(), datum_query.end(), dateCmp);
+  stable_sort(datum_query.begin(), datum_query.end(), exchangeCmp);
   // sort min
   sort(datum_min.begin(), datum_min.end(), lowCmp);
-  stable_sort(datum_min.begin(), datum_min.end(), currencyCmp);
   stable_sort(datum_min.begin(), datum_min.end(), dateCmp);
-
+  stable_sort(datum_min.begin(), datum_min.end(), currencyCmp);
   // sort max
   sort(datum_max.begin(), datum_max.end(), highCmp);
+  stable_sort(datum_max.begin(), datum_max.end(), dateCmp);
   stable_sort(datum_max.begin(), datum_max.end(), currencyCmp);
-  stable_sort(datum_max.begin(), datum_max.end(), dateCmp);
-  // sort cap
-  sort(datum_max.begin(), datum_max.end(), exchangeCmp);
-  stable_sort(datum_max.begin(), datum_max.end(), dateCmp);
-
-  // printVector(datum_query);
 
   for (string line; getline(std::cin, line);) {
     Data *tmp = new Data();
@@ -156,13 +148,24 @@ int main(int argc, char *argv[]) {
       tmp->setCurrency(tokens[2]);
       tmp->setExchange(tokens[3]);
       vector<Data>::iterator date_low, date_up;
-      vector<Data>::iterator currency_low, currency_up;
-      vector<Data>::iterator exchange_low;
+      vector<Data>::iterator currency_low;
+      vector<Data>::iterator exchange_low, exchange_up;
+
+      exchange_low = lower_bound(datum_query.begin(), datum_query.end(), *tmp,
+                                 exchangeCmp);
+      exchange_up = upper_bound(datum_query.begin(), datum_query.end(), *tmp,
+                                exchangeCmp);
+      if (exchange_low->getExchange() != tmp->getExchange()) {
+        cout << "none" << endl;
+        continue;
+      }
+      if (exchange_low->getExchange() != tmp->getExchange()) {
+        exchange_up -= 1;
+      }
+
       // binary search lower and upper
-      date_low =
-          lower_bound(datum_query.begin(), datum_query.end(), *tmp, dateCmp);
-      date_up =
-          upper_bound(datum_query.begin(), datum_query.end(), *tmp, dateCmp);
+      date_low = lower_bound(exchange_low, exchange_up, *tmp, dateCmp);
+      date_up = upper_bound(exchange_low, exchange_up, *tmp, dateCmp);
       // if not find
       if (date_low->getDate() != tmp->getDate()) {
         cout << "none" << endl;
@@ -174,41 +177,49 @@ int main(int argc, char *argv[]) {
       }
 
       currency_low = lower_bound(date_low, date_up, *tmp, currencyCmp);
-      currency_up = upper_bound(date_low, date_up, *tmp, currencyCmp);
       if (currency_low->getCurrency() != tmp->getCurrency()) {
         cout << "none" << endl;
         continue;
       }
-      if (currency_up->getCurrency() != tmp->getCurrency()) {
-        currency_up -= 1;
-      }
 
-      exchange_low = lower_bound(currency_low, currency_up, *tmp, exchangeCmp);
-      if (exchange_low->getExchange() != tmp->getExchange()) {
-        cout << "none" << endl;
-        continue;
-      }
-
-      int index = distance(datum_query.begin(), exchange_low);
+      int index = distance(datum_query.begin(), currency_low);
       cout << fixed << setprecision(4) << datum_query[index].getLow() << " "
            << datum_query[index].getHigh() << " "
            << datum_query[index].getCapital() << endl;
     } else if (tokens[0] == "price") {
-      vector<Data> vd;
       vector<Data>::iterator date_low, date_up;
       vector<Data>::iterator currency_low, currency_up;
       vector<Data>::iterator m_low, m_high; // min or max
       // arguments
       tmp->setDate(tokens[2]);
       tmp->setCurrency(tokens[3]);
-      if (tokens[1] == "min") {
-        vd = datum_min;
-      } else {
-        vd = datum_max;
-      }
+
+      currency_low = lower_bound(date_low, date_up, *tmp, currencyCmp);
+      currency_up = upper_bound(date_low, date_up, *tmp, currencyCmp);
+
       // binary search lower and upper
-      date_low = lower_bound(vd.begin(), vd.end(), *tmp, dateCmp);
-      date_up = upper_bound(vd.begin(), vd.end(), *tmp, dateCmp);
+      if (tokens[1] == "min") {
+        currency_low =
+            lower_bound(datum_min.begin(), datum_min.end(), *tmp, currencyCmp);
+        currency_up =
+            upper_bound(datum_min.begin(), datum_min.end(), *tmp, currencyCmp);
+
+      } else {
+        currency_low =
+            lower_bound(datum_max.begin(), datum_max.end(), *tmp, currencyCmp);
+        currency_up =
+            upper_bound(datum_max.begin(), datum_max.end(), *tmp, currencyCmp);
+      }
+      if (currency_low->getCurrency() != tmp->getCurrency()) {
+        cout << "none" << endl;
+        continue;
+      }
+      if (currency_up->getCurrency() != tmp->getCurrency()) {
+        currency_up -= 1;
+      }
+
+      date_low = lower_bound(currency_low, currency_up, *tmp, dateCmp);
+      date_up = upper_bound(currency_low, currency_up, *tmp, dateCmp);
       // if not find
       if (date_low->getDate() != tmp->getDate()) {
         cout << "none" << endl;
@@ -219,22 +230,10 @@ int main(int argc, char *argv[]) {
         date_up -= 1;
       }
 
-      currency_low = lower_bound(date_low, date_up, *tmp, currencyCmp);
-      currency_up = upper_bound(date_low, date_up, *tmp, currencyCmp);
-      if (currency_low->getCurrency() != tmp->getCurrency()) {
-        cout << "none" << endl;
-        continue;
-      }
-      if (currency_up->getCurrency() != tmp->getCurrency()) {
-        currency_up -= 1;
-      }
-
       if (tokens[1] == "min") {
-        m_low = lower_bound(currency_low, currency_up, *tmp, lowCmp);
-        cout << fixed << setprecision(4) << m_low->getLow() << endl;
+        cout << fixed << setprecision(4) << date_low->getLow() << endl;
       } else {
-        m_high = upper_bound(currency_low, currency_up, *tmp, highCmp);
-        cout << fixed << setprecision(4) << m_high->getHigh() << endl;
+        cout << fixed << setprecision(4) << date_up->getHigh() << endl;
       }
     } else if (tokens[0] == "cap") {
       vector<Data>::iterator date_low, date_up;
@@ -243,8 +242,23 @@ int main(int argc, char *argv[]) {
       tmp->setExchange(tokens[2]);
 
       // binary search lower and upper
-      date_low = lower_bound(datum_cap.begin(), datum_cap.end(), *tmp, dateCmp);
-      date_up = upper_bound(datum_cap.begin(), datum_cap.end(), *tmp, dateCmp);
+      exchange_low = lower_bound(datum_query.begin(), datum_query.end(), *tmp,
+                                 exchangeCmp);
+      exchange_up = upper_bound(datum_query.begin(), datum_query.end(), *tmp,
+                                exchangeCmp);
+      // if not find
+      if (exchange_low->getExchange() != tmp->getExchange()) {
+        cout << "none" << endl;
+        continue;
+      }
+      // check the upper bound
+      if (exchange_low->getExchange() != tmp->getExchange()) {
+        exchange_up -= 1;
+      }
+
+      // binary search lower and upper
+      date_low = lower_bound(exchange_low, exchange_up, *tmp, dateCmp);
+      date_up = upper_bound(exchange_low, exchange_up, *tmp, dateCmp);
       // if not find
       if (date_low->getDate() != tmp->getDate()) {
         cout << "none" << endl;
@@ -255,14 +269,8 @@ int main(int argc, char *argv[]) {
         date_up -= 1;
       }
 
-      exchange_low = lower_bound(date_low, date_up, *tmp, exchangeCmp);
-      exchange_up = upper_bound(date_low, date_up, *tmp, exchangeCmp);
-      if (exchange_low->getExchange() != tmp->getExchange()) {
-        cout << "none" << endl;
-        continue;
-      }
       long sum = 0;
-      for (vector<Data>::iterator it = exchange_low; it <= exchange_up; it++) {
+      for (vector<Data>::iterator it = date_low; it <= date_up; it++) {
         sum += it->getCapital();
       }
       cout << sum << endl;
