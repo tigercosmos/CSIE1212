@@ -9,9 +9,6 @@
 using namespace std;
 
 struct Data {
-  // void print();
-  // void printInLine();
-
   string date;
   string currency;
   string exchange;
@@ -51,30 +48,6 @@ static void split(Data &d, const string &s, char delimiter) {
   }
 }
 
-/*
-void Data::print() {
-  cout << fixed << setprecision(4) << "date: " << date << endl
-       << "currency: " << currency << endl
-       << "exchange: " << exchange << endl
-       << "low: " << low << endl
-       << "high: " << high << endl
-       << "capital: " << capital << endl;
-}
-
-void Data::printInLine() {
-  cout << fixed << setprecision(4) << "date: " << date << '\t'
-       << "currency: " << currency << '\t' << "exchange: " << exchange << '\t'
-       << "low: " << low << '\t' << "high: " << high << '\t'
-       << "capital: " << capital << endl;
-}
-
-void printVector(vector<Data> &v) {
-  for (int i = 0; i < v.size(); i++) {
-    v[i].printInLine();
-  }
-}
-*/
-
 static bool exchangeCmp(Data const &a, Data const &b) {
   return a.exchange < b.exchange;
 }
@@ -97,6 +70,8 @@ int main(int argc, char *argv[]) {
 
   vector<Data> datum_query;
   vector<Data> datum_m;
+  datum_query.reserve(2000000);
+  datum_m.reserve(2000000);
 
   // input data from file and store in datum_query
   do {
@@ -106,6 +81,7 @@ int main(int argc, char *argv[]) {
       split(*data, line, '\t');
       datum_query.push_back(*data);
       datum_m.push_back(*data);
+      delete data;
     }
   } while (0);
 
