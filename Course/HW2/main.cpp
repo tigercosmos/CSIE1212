@@ -113,14 +113,15 @@ int main(int argc, char *argv[]) {
   vector<Data> datum_m;
 
   // input data from file and store in datum_query
-  ifstream input(argv[1]);
-  for (string line; getline(input, line);) {
-    Data *data = new Data();
-    split(*data, line, '\t');
-    datum_query.push_back(*data);
-  }
-  // copt vector to all vector
-  datum_m.assign(datum_query.begin(), datum_query.end());
+  do {
+    ifstream input(argv[1]);
+    for (string line; getline(input, line);) {
+      Data *data = new Data();
+      split(*data, line, '\t');
+      datum_query.push_back(*data);
+      datum_m.push_back(*data);
+    }
+  } while (0);
 
   // sort query
   sort(datum_query.begin(), datum_query.end(), currencyCmp);
