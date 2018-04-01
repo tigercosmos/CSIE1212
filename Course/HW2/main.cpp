@@ -106,8 +106,7 @@ bool capitalCmp(Data const &a, Data const &b) { return a.capital < b.capital; }
 int main(int argc, char *argv[]) {
 
   vector<Data> datum_query;
-  vector<Data> datum_min;
-  vector<Data> datum_max;
+  vector<Data> datum_m;
 
   // input data from file and store in datum_query
   ifstream input(argv[1]);
@@ -117,21 +116,15 @@ int main(int argc, char *argv[]) {
     datum_query.push_back(*data);
   }
   // copt vector to all vector
-  datum_min.assign(datum_query.begin(), datum_query.end());
-  datum_max.assign(datum_query.begin(), datum_query.end());
+  datum_m.assign(datum_query.begin(), datum_query.end());
 
   // sort query
   stable_sort(datum_query.begin(), datum_query.end(), currencyCmp);
   stable_sort(datum_query.begin(), datum_query.end(), dateCmp);
   stable_sort(datum_query.begin(), datum_query.end(), exchangeCmp);
   // sort min
-  sort(datum_min.begin(), datum_min.end(), lowCmp);
-  stable_sort(datum_min.begin(), datum_min.end(), dateCmp);
-  stable_sort(datum_min.begin(), datum_min.end(), currencyCmp);
-  // sort max
-  sort(datum_max.begin(), datum_max.end(), highCmp);
-  stable_sort(datum_max.begin(), datum_max.end(), dateCmp);
-  stable_sort(datum_max.begin(), datum_max.end(), currencyCmp);
+  stable_sort(datum_m.begin(), datum_m.end(), dateCmp);
+  stable_sort(datum_m.begin(), datum_m.end(), currencyCmp);
 
   for (string line; getline(std::cin, line);) {
     Data *tmp = new Data();
@@ -198,18 +191,11 @@ int main(int argc, char *argv[]) {
       currency_up = upper_bound(date_low, date_up, *tmp, currencyCmp);
 
       // binary search lower and upper
-      if (tokens[1] == "min") {
-        currency_low =
-            lower_bound(datum_min.begin(), datum_min.end(), *tmp, currencyCmp);
-        currency_up =
-            upper_bound(datum_min.begin(), datum_min.end(), *tmp, currencyCmp);
+      currency_low =
+          lower_bound(datum_m.begin(), datum_m.end(), *tmp, currencyCmp);
+      currency_up =
+          upper_bound(datum_m.begin(), datum_m.end(), *tmp, currencyCmp);
 
-      } else {
-        currency_low =
-            lower_bound(datum_max.begin(), datum_max.end(), *tmp, currencyCmp);
-        currency_up =
-            upper_bound(datum_max.begin(), datum_max.end(), *tmp, currencyCmp);
-      }
       if (currency_low->getCurrency() != tmp->getCurrency()) {
         cout << "none" << endl;
         continue;
@@ -231,8 +217,10 @@ int main(int argc, char *argv[]) {
       }
 
       if (tokens[1] == "min") {
+        sort(date_low, date_up, lowCmp);
         cout << fixed << setprecision(4) << date_low->getLow() << endl;
       } else {
+        sort(date_low, date_up, highCmp);
         cout << fixed << setprecision(4) << date_up->getHigh() << endl;
       }
     } else if (tokens[0] == "cap") {
