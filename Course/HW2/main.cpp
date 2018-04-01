@@ -22,9 +22,8 @@ public:
   float getLow() { return low; }
   float getHigh() { return high; }
   long getCapital() { return capital; }
-  void split(const string &s, char delimiter);
-  void print();
-  void printInLine();
+  // void print();
+  // void printInLine();
 
   string date;
   string currency;
@@ -34,29 +33,29 @@ public:
   long capital;
 };
 
-void Data::split(const string &s, char delimiter) {
+static void split(Data &d, const string &s, char delimiter) {
   string token;
   istringstream tokenStream(s);
   int i = 0;
   while (getline(tokenStream, token, delimiter)) {
     switch (i) {
     case 0:
-      setDate(token);
+      d.setDate(token);
       break;
     case 1:
-      setCurrency(token);
+      d.setCurrency(token);
       break;
     case 2:
-      setExchange(token);
+      d.setExchange(token);
       break;
     case 3:
-      setLow(stof(token));
+      d.setLow(stof(token));
       break;
     case 4:
-      setHigh(stof(token));
+      d.setHigh(stof(token));
       break;
     case 5:
-      setCapital(stol(token));
+      d.setCapital(stol(token));
       break;
     default:
       break;
@@ -65,6 +64,7 @@ void Data::split(const string &s, char delimiter) {
   }
 }
 
+/*
 void Data::print() {
   cout << fixed << setprecision(4) << "date: " << date << endl
        << "currency: " << currency << endl
@@ -81,27 +81,32 @@ void Data::printInLine() {
        << "capital: " << capital << endl;
 }
 
+
 void printVector(vector<Data> &v) {
   for (int i = 0; i < v.size(); i++) {
     v[i].printInLine();
   }
 }
 
-bool exchangeCmp(Data const &a, Data const &b) {
+*/
+
+static bool exchangeCmp(Data const &a, Data const &b) {
   return a.exchange < b.exchange;
 }
 
-bool dateCmp(Data const &a, Data const &b) { return a.date < b.date; }
+static bool dateCmp(Data const &a, Data const &b) { return a.date < b.date; }
 
-bool currencyCmp(Data const &a, Data const &b) {
+static bool currencyCmp(Data const &a, Data const &b) {
   return a.currency < b.currency;
 }
 
-bool lowCmp(Data const &a, Data const &b) { return a.low < b.low; }
+static bool lowCmp(Data const &a, Data const &b) { return a.low < b.low; }
 
-bool highCmp(Data const &a, Data const &b) { return a.high < b.high; }
+static bool highCmp(Data const &a, Data const &b) { return a.high < b.high; }
 
-bool capitalCmp(Data const &a, Data const &b) { return a.capital < b.capital; }
+static bool capitalCmp(Data const &a, Data const &b) {
+  return a.capital < b.capital;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -112,7 +117,7 @@ int main(int argc, char *argv[]) {
   ifstream input(argv[1]);
   for (string line; getline(input, line);) {
     Data *data = new Data();
-    data->split(line, '\t');
+    split(*data, line, '\t');
     datum_query.push_back(*data);
   }
   // copt vector to all vector
