@@ -8,6 +8,13 @@ Your job: Sort the data with multiple keys, and support each task list below.
 ### Data format will be:
 ```
 Date, currency, exchange, low, high, daily caps
+
+Date: in the format "yyyymmdd"
+currency: Name of the cryptocurrency (string length < 100)
+exchange: Name of the exchange (string length < 100)
+Low/High: Lowest/Highest of the currency on that day (with data type of float)
+cap: value of transactions (with data type of long long int)
+
 Each column will seperate with tabs ('\t'), 
 each data will seperate with newline ('\n').
 ```
@@ -85,7 +92,7 @@ Output: 2.9440    4.6044    24
 ```
 
 ```
-Input: price    low    20130114    Diamond
+Input: price    min    20130114    Diamond
 Output: 4.6257
 ```
 ```
@@ -109,6 +116,5 @@ Except that cap should store with long, all data will fit in integer/float.
 
 
 ## Requirements
-Time limit: TBD
-Memory limit: TBD
-FYI, TA's program(fgets, std:sort, binary search) spend mostly 11s, max 12s on linux8. 10s on my PC, 15s on my laptop.
+Time, Memory limit on judge.
+FYI, TA's program(fgets, std:sort, binary search, without optimization) spend mostly 11s, max 12s on linux8. 10s on my PC, 15s on my laptop.
