@@ -119,15 +119,16 @@ int main(int argc, char *argv[]) {
   datum_m.assign(datum_query.begin(), datum_query.end());
 
   // sort query
-  stable_sort(datum_query.begin(), datum_query.end(), currencyCmp);
+  sort(datum_query.begin(), datum_query.end(), currencyCmp);
   stable_sort(datum_query.begin(), datum_query.end(), dateCmp);
   stable_sort(datum_query.begin(), datum_query.end(), exchangeCmp);
   // sort min
-  stable_sort(datum_m.begin(), datum_m.end(), dateCmp);
+  sort(datum_m.begin(), datum_m.end(), dateCmp);
   stable_sort(datum_m.begin(), datum_m.end(), currencyCmp);
 
+  Data *tmp = new Data();
+
   for (string line; getline(std::cin, line);) {
-    Data *tmp = new Data();
     string token;
     vector<string> tokens;
     istringstream tokenStream(line);
