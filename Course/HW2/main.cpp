@@ -17,7 +17,7 @@ struct Data {
   string exchange;
   float low;
   float high;
-  long capital;
+  int capital;
 };
 
 static void split(Data &d, const string &s, char delimiter) {
