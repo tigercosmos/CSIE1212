@@ -22,6 +22,7 @@ public:
   float getLow() { return low; }
   float getHigh() { return high; }
   long getCapital() { return capital; }
+
   // void print();
   // void printInLine();
 
@@ -81,13 +82,11 @@ void Data::printInLine() {
        << "capital: " << capital << endl;
 }
 
-
 void printVector(vector<Data> &v) {
   for (int i = 0; i < v.size(); i++) {
     v[i].printInLine();
   }
 }
-
 */
 
 static bool exchangeCmp(Data const &a, Data const &b) {
@@ -223,10 +222,10 @@ int main(int argc, char *argv[]) {
       }
 
       if (tokens[1] == "min") {
-        sort(date_low, date_up, lowCmp);
+        sort(date_low, date_up + 1, lowCmp);
         cout << fixed << setprecision(4) << date_low->getLow() << endl;
       } else {
-        sort(date_low, date_up, highCmp);
+        sort(date_low, date_up + 1, highCmp);
         cout << fixed << setprecision(4) << date_up->getHigh() << endl;
       }
     } else if (tokens[0] == "cap") {
