@@ -1,0 +1,9 @@
+query	20130114	Diamond	Tidex
+query	20130807	LEOcoin	C-CEX
+query	20180114	Diamond	Tidex
+query	20130114	tiger	Tidex
+query	20130114	Diamond	tiger
+price	min	20130611	Zcash
+price	max	20130611	Zcash
+cap	20130827	BTCC
+end
