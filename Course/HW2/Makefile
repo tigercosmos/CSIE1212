@@ -1,5 +1,5 @@
 all:
-	g++ main.cpp -std=c++11
+	g++ main.cpp -std=c++11 -O2
 run:
 	make
 	./a.out test_data/short_data.txt < test_data/short.in > tmp.out
