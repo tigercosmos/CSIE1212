@@ -6,4 +6,6 @@ query	20130114	Diamond	tiger
 price	min	20130611	Zcash
 price	max	20130611	Zcash
 cap	20130827	BTCC
+cap	20130611	Satoshi
+cap	20130611	Sathi
 end
