@@ -15,7 +15,7 @@ struct Data {
   string exchange;
   float low;
   float high;
-  int capital;
+  long capital;
 };
 
 static void split(Data &d, const string &s, char delimiter) {
@@ -295,7 +295,7 @@ int main(int argc, char *argv[]) {
         date_up -= 1;
       }
 
-      long sum = 0;
+      long long sum = 0;
       for (int it = distance(datum_query.begin(), date_low);
            it <= distance(datum_query.begin(), date_up); it++) {
         sum += datum_query[it]->capital;
