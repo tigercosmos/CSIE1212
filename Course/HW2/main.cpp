@@ -96,15 +96,16 @@ int main(int argc, char *argv[]) {
     Data *data = new Data();
     split(*data, line, '\t');
     datum_query.push_back(data);
-    datum_m.push_back(data);
   }
 
   // sort query
   sort(datum_query.begin(), datum_query.end(), currencyCmp);
   stable_sort(datum_query.begin(), datum_query.end(), dateCmp);
+  // copy here that reduce once sorting
+  datum_m.assign(datum_query.begin(), datum_query.end());
   stable_sort(datum_query.begin(), datum_query.end(), exchangeCmp);
-  // sort min
-  sort(datum_m.begin(), datum_m.end(), dateCmp);
+  
+  // sort min/max
   stable_sort(datum_m.begin(), datum_m.end(), currencyCmp);
 
   Data *tmp = new Data();
