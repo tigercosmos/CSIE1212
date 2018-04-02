@@ -8,4 +8,10 @@ price	max	20130611	Zcash
 cap	20130827	BTCC
 cap	20130611	Satoshi
 cap	20130611	Sathi
+cap	201306119	Sathi
+cap	20130611	Sathiii
+price	min	201306113	Zcash
+price	max	201306113	Zcash
+price	min	20130611	Zcash3
+price	max	20130611	Zcash9
 end
