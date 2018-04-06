@@ -24,7 +24,10 @@
         "utility": "cpp",
         "bitset": "cpp",
         "istream": "cpp",
-        "atomic": "cpp"
+        "atomic": "cpp",
+        "__functional_03": "cpp",
+        "functional": "cpp",
+        "system_error": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }

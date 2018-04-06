@@ -18,7 +18,7 @@ struct Data {
   long capital;
 };
 
-static void split(Data &d, const string &s, char delimiter) {
+inline static void split(Data &d, const string &s, char delimiter) {
   string token;
   istringstream tokenStream(s);
   int i = 0;
@@ -49,26 +49,44 @@ static void split(Data &d, const string &s, char delimiter) {
   }
 }
 
-static bool exchangeCmp(Data *const &a, Data *const &b) {
+inline static bool exchangeCmp(Data *const &a, Data *const &b) {
   return a->exchange < b->exchange;
 }
 
-static bool dateCmp(Data *const &a, Data *const &b) {
+inline static bool dateCmp(Data *const &a, Data *const &b) {
   return a->date < b->date;
 }
 
-static bool currencyCmp(Data *const &a, Data *const &b) {
+inline static bool currencyCmp(Data *const &a, Data *const &b) {
   return a->currency < b->currency;
 }
 
-static bool lowCmp(Data *const &a, Data *const &b) { return a->low < b->low; }
+inline static bool lowCmp(Data *const &a, Data *const &b) {
+  return a->low < b->low;
+}
 
-static bool highCmp(Data *const &a, Data *const &b) {
+inline static bool highCmp(Data *const &a, Data *const &b) {
   return a->high < b->high;
 }
 
-static bool capitalCmp(Data *const &a, Data *const &b) {
+inline static bool capitalCmp(Data *const &a, Data *const &b) {
   return a->capital < b->capital;
+}
+
+inline static bool mmCmp(Data *const &a, Data *const &b) {
+  if (a->currency != b->currency) {
+    return a->currency < b->currency;
+  }
+  return a->date < b->date;
+}
+
+inline static bool qCmp(Data *const &a, Data *const &b) {
+  if (a->exchange != b->exchange) {
+    return a->exchange < b->exchange;
+  } else if (a->date != b->date) {
+    return a->date < b->date;
+  }
+  return a->currency < b->currency;
 }
 
 // void Data::printInLine() {
@@ -87,8 +105,8 @@ int main(int argc, char *argv[]) {
 
   vector<Data *> datum_query;
   vector<Data *> datum_m;
-  datum_query.reserve(2000000);
-  datum_m.reserve(2000000);
+  datum_query.reserve(300000);
+  datum_m.reserve(300000);
 
   // input data from file and store in datum_query
   ifstream input(argv[1]);
@@ -96,17 +114,13 @@ int main(int argc, char *argv[]) {
     Data *data = new Data();
     split(*data, line, '\t');
     datum_query.push_back(data);
+    datum_m.push_back(data);
   }
 
   // sort query
-  sort(datum_query.begin(), datum_query.end(), currencyCmp);
-  stable_sort(datum_query.begin(), datum_query.end(), dateCmp);
-  // copy here that reduce once sorting
-  datum_m.assign(datum_query.begin(), datum_query.end());
-  stable_sort(datum_query.begin(), datum_query.end(), exchangeCmp);
-  
+  sort(datum_query.begin(), datum_query.end(), qCmp);
   // sort min/max
-  stable_sort(datum_m.begin(), datum_m.end(), currencyCmp);
+  sort(datum_m.begin(), datum_m.end(), mmCmp);
 
   Data *tmp = new Data();
 
@@ -291,7 +305,7 @@ int main(int argc, char *argv[]) {
       if (distance(datum_query.begin(), date_up) >= datum_query.size()) {
         date_up -= 1;
       } else if (datum_query[distance(datum_query.begin(), date_up)]->date !=
-          tmp->date) {
+                 tmp->date) {
         date_up -= 1;
       }
 
