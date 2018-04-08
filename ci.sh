@@ -12,4 +12,4 @@ echo "Testing make HW1 ...."
 make
 cd "$ROOT/Course/HW2"
 echo "Testing make HW2 ...."
-make run
+time -f "%Us %MkB" make test
