@@ -7,3 +7,9 @@ for i in Leetcode/* ; do
     cd $ROOT
   fi
 done
+cd Course/HW1
+echo "Testing make HW1 ...."
+make
+cd "$ROOT/Course/HW2"
+echo "Testing make HW2 ...."
+make run
