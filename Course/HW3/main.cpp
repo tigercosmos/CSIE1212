@@ -8,18 +8,25 @@
 using namespace std;
 #define ull unsigned long long
 
-unordered_map<ull, int> umap;
-
 enum GamePiece { CIRCLE_PIECE = 1, FORK_PIECE = 2 };
 enum GameResult { DRAW = 0, CIRCLE_WIN = 1, FORK_WIN = 2 };
 enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
 
-void printVector(vector<int> v) {
-  for (int i = 0; i < v.size(); i++) {
-    cout << v[i] << " ";
-  }
-  cout << endl;
-}
+unordered_map<ull, GameResult> umap;
+
+// void printVector(vector<int> v) {
+//   for (int i = 0; i < v.size(); i++) {
+//     cout << v[i] << " ";
+//   }
+//   cout << endl;
+// }
+
+// void printVectorVector(vector<vector<int>> v) {
+//   for (int i = 0; i < v.size(); i++) {
+//     cout << "[" << v[i][0] << ", " << v[i][1] << "] ";
+//   }
+//   cout << endl;
+// }
 
 inline static ull input_game() {
   ull board = 0;
@@ -170,7 +177,7 @@ vector<vector<int>> find_next_sets(vector<int> &v) {
   vector<vector<int>> tmp;
   for (int i = 0; i < v.size(); i++) {
     for (int j = i + 1; j < v.size(); j++) {
-      vector<int> t = {i, j};
+      vector<int> t = {v[i], v[j]};
       tmp.push_back(t);
     }
   }
@@ -187,33 +194,48 @@ GameResult who_win(ull board, GameTurn round) {
     }
     result = evaluate(board);
   } else {
-    vector<vector<int>> next_sets = find_next_sets(emptys);
+    auto search = umap.find(this_board);
+    if (search != umap.end()) {
+      return search->second;
+    }
 
+    vector<vector<int>> next_sets = find_next_sets(emptys);
     if (round == CIRCLE_TURN) {
+      result = FORK_WIN;
       for (int i = 0; i < next_sets.size(); i++) {
         ull next_board = this_board;
-        move_piece(&this_board, next_sets[i][0], CIRCLE_TURN);
-        move_piece(&this_board, next_sets[i][1], CIRCLE_TURN);
+        move_piece(&next_board, next_sets[i][0], CIRCLE_TURN);
+        move_piece(&next_board, next_sets[i][1], CIRCLE_TURN);
         GameResult nextresult = who_win(next_board, FORK_TURN);
-        if (nextresult == FORK_WIN) {
-          result = FORK_WIN;
-        } else if (nextresult == DRAW && result == CIRCLE_WIN) {
-          result = DRAW;
-        }
-      }
-    } else {
-      for (int i = 0; i < next_sets.size(); i++) {
-        ull next_board = this_board;
-        move_piece(&this_board, next_sets[i][0], FORK_TURN);
-        move_piece(&this_board, next_sets[i][1], FORK_TURN);
-        GameResult nextresult = who_win(next_board, CIRCLE_TURN);
+
         if (nextresult == CIRCLE_WIN) {
           result = CIRCLE_WIN;
         } else if (nextresult == DRAW && result == FORK_WIN) {
           result = DRAW;
         }
       }
+      return result;
+    } else {
+      result = CIRCLE_WIN;
+      for (int i = 0; i < next_sets.size(); i++) {
+        ull next_board = this_board;
+        move_piece(&next_board, next_sets[i][0], FORK_TURN);
+        move_piece(&next_board, next_sets[i][1], FORK_TURN);
+        GameResult nextresult = who_win(next_board, CIRCLE_TURN);
+
+        if (nextresult == FORK_WIN) {
+          result = FORK_WIN;
+        } else if (nextresult == DRAW && result == CIRCLE_WIN) {
+          result = DRAW;
+        }
+      }
+      return result;
     }
+  }
+
+  auto search = umap.find(this_board);
+  if (search == umap.end()) {
+    umap.insert({this_board, result});
   }
   return result;
 }

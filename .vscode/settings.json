@@ -30,7 +30,8 @@
         "system_error": "cpp",
         "chrono": "cpp",
         "sstream": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "*.tcc": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }
