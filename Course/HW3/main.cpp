@@ -210,12 +210,13 @@ GameResult who_win(ull board, GameTurn round) {
 
         if (nextresult == CIRCLE_WIN) {
           result = CIRCLE_WIN;
+          break;
         } else if (nextresult == DRAW && result == FORK_WIN) {
           result = DRAW;
         }
       }
       return result;
-    } else {
+    } else if (round == FORK_TURN) {
       result = CIRCLE_WIN;
       for (int i = 0; i < next_sets.size(); i++) {
         ull next_board = this_board;
@@ -225,6 +226,7 @@ GameResult who_win(ull board, GameTurn round) {
 
         if (nextresult == FORK_WIN) {
           result = FORK_WIN;
+          break;
         } else if (nextresult == DRAW && result == CIRCLE_WIN) {
           result = DRAW;
         }
