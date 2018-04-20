@@ -27,7 +27,9 @@
         "atomic": "cpp",
         "__functional_03": "cpp",
         "functional": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "chrono": "cpp",
+        "sstream": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }
