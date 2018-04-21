@@ -1,11 +1,11 @@
 #include <algorithm>
 #include <bitset>
 #include <iostream>
-#include <map>
 #include <new>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <map>
 using namespace std;
 #define ull unsigned long long
 #define INF 100000
@@ -293,19 +293,13 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
   vector<vector<int>> next_sets = find_next_sets(emptys);
   if (round == CIRCLE_TURN) {
     int best_val = -INF;
-    multimap<int, ull> next_boards;
     for (int i = 0; i < next_sets.size(); i++) {
       ull next_board = this_board;
       move_piece(&next_board, next_sets[i][0], CIRCLE_TURN);
       move_piece(&next_board, next_sets[i][1], CIRCLE_TURN);
-      int val = evaluate(&next_board, false);
-      next_boards.insert({val, next_board});
-    }
-    for (auto it = next_boards.rbegin(); it != next_boards.rend(); it++) {
-      ull next_board = it->second;
       int next_result;
       // auto search = umap.find(next_board);
-      // if (search != umap.end()) {
+      // if (search != umap.end()) {        
       //   next_result = search->second;
       // } else {
       next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
@@ -319,16 +313,10 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
     return best_val;
   } else if (round == FORK_TURN) {
     int best_val = INF;
-    multimap<int, ull> next_boards;
     for (int i = 0; i < next_sets.size(); i++) {
       ull next_board = this_board;
       move_piece(&next_board, next_sets[i][0], FORK_TURN);
       move_piece(&next_board, next_sets[i][1], FORK_TURN);
-      int val = evaluate(&next_board, false);
-      next_boards.insert({val, next_board});
-    }
-    for (auto it = next_boards.begin(); it != next_boards.end(); it++) {
-      ull next_board = it->second;
       int next_result;
       // auto search = umap.find(next_board);
       // if (search != umap.end()) {
