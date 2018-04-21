@@ -15,4 +15,4 @@ echo "Testing make HW2 ...."
 time -f "%Us %MkB" make test
 cd "$ROOT/Course/HW3"
 echo "Testing make HW3 ...."
-make test
+make test1

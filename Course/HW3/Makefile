@@ -3,20 +3,20 @@ all:
 
 run:
 	make
-	./a.out
+	./a.out < ./test/1.in
 
-test:
+test1:
 	make
-	./a.out < test/1.in > tmp.out
-	diff tmp.out test/1.out
+	./a.out < ./test/1.in > tmp.out
+	diff tmp.out ./test/1.out
 
 test2:
 	make
-	gtime -f "%Us %MkB" ./a.out < test/2.in > tmp.out
-	diff tmp.out test/2.out
+	gtime -f "%Us %MkB" ./a.out < ./test/2.in > tmp.out
+	diff tmp.out ./test/2.out
 
 test3:
 	make
-	gtime -f "%Us %MkB" ./a.out < test/3.in > tmp.out
-	diff tmp.out test/3.out
+	gtime -f "%Us %MkB" ./a.out < ./test/3.in > tmp.out
+	diff tmp.out ./test/3.out
 	
