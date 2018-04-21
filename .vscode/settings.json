@@ -31,7 +31,8 @@
         "chrono": "cpp",
         "sstream": "cpp",
         "cmath": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "array": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }
