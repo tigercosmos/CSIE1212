@@ -9,7 +9,7 @@ using namespace std;
 #define ull unsigned long long
 
 enum GamePiece { CIRCLE_PIECE = 1, FORK_PIECE = 2 };
-enum GameResult { DRAW = 0, CIRCLE_WIN = 1, FORK_WIN = 2 };
+enum GameResult { DRAW = 0, CIRCLE_WIN = 1, FORK_WIN = 2, ING = 4 };
 enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
 
 unordered_map<ull, GameResult> umap;
@@ -64,8 +64,7 @@ inline GameTurn get_round(ull board) {
   return FORK_TURN;
 }
 
-// when the board is filled with pieces, and then evaluate the result.
-GameResult evaluate(ull board) {
+void count_lines(const ull *board, int *circle, int *fork) {
   int result_counter = 0;
   for (int row = 0; row < 5; row++) {
     char line_row_count_O = 0;
@@ -77,7 +76,7 @@ GameResult evaluate(ull board) {
       // for row
       ull tmp = 1;
       tmp <<= col * 2 + 10 * row;
-      if (board & tmp) {
+      if (*board & tmp) {
         line_row_count_O += 1;
       } else {
         line_row_count_X -= 1;
@@ -86,20 +85,20 @@ GameResult evaluate(ull board) {
       // for column
       tmp = 1;
       tmp <<= col * 10 + 2 * row;
-      if (board & tmp)
+      if (*board & tmp)
         line_col_count_O += 1;
       else
         line_col_count_X -= 1;
     }
     if (line_col_count_O >= 4) {
-      result_counter += 1;
+      *circle += 1;
     } else if (line_col_count_X <= -4) {
-      result_counter -= 1;
+      *fork += 1;
     }
     if (line_row_count_O >= 4) {
-      result_counter += 1;
+      *circle += 1;
     } else if (line_row_count_X <= -4) {
-      result_counter -= 1;
+      *fork += 1;
     }
   }
 
@@ -115,30 +114,50 @@ GameResult evaluate(ull board) {
     ull tmp2 = 1;
     tmp1 <<= diagonal_left[i] * 2;
     tmp2 <<= diagonal_right[i] * 2;
-    if (board & tmp1)
+    if (*board & tmp1)
       line_diagonal_left_count_O += 1;
     else
       line_diagonal_left_count_X -= 1;
-    if (board & tmp2)
+    if (*board & tmp2)
       line_diagonal_right_count_O += 1;
     else
       line_diagonal_right_count_X -= 1;
   }
   if (line_diagonal_left_count_O >= 4) {
-    result_counter += 1;
+    *circle += 1;
   } else if (line_diagonal_left_count_X <= -4) {
-    result_counter -= 1;
+    *fork += 1;
   }
   if (line_diagonal_right_count_O >= 4) {
-    result_counter += 1;
+    *circle += 1;
   } else if (line_diagonal_right_count_X <= -4) {
-    result_counter -= 1;
+    *fork += 1;
   }
-  if (result_counter > 0)
+}
+
+// when the board is filled with pieces, and then evaluate the result.
+GameResult evaluate(ull board, bool isFinal) {
+  int circle = 0;
+  int fork = 0;
+
+  count_lines(&board, &circle, &fork);
+
+  if (isFinal) {
+    if (circle > fork)
+      return CIRCLE_WIN;
+    if (circle < fork)
+      return FORK_WIN;
+    else
+      return DRAW;
+  }
+
+  if (circle >= 4) {
     return CIRCLE_WIN;
-  if (result_counter < 0)
-    return FORK_WIN;
-  return DRAW;
+  }
+  // if (fork >= 3) {
+  //   return FORK_WIN;
+  // }
+  return ING;
 }
 
 vector<int> find_empty(ull *board) {
@@ -195,11 +214,16 @@ GameResult who_win(ull board, GameTurn round) {
     for (int i = 0; i < emptys.size(); i++) {
       move_piece(&this_board, emptys[i], FORK_TURN);
     }
-    result = evaluate(board);
+    result = evaluate(board, true);
   } else {
     auto search = umap.find(this_board);
     if (search != umap.end()) {
       return search->second;
+    }
+
+    auto checking = evaluate(board, false);
+    if (checking != ING) {
+      return checking;
     }
 
     vector<vector<int>> next_sets = find_next_sets(emptys);

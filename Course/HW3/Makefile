@@ -9,3 +9,7 @@ test:
 	make
 	./a.out < test.in > tmp.out
 	diff tmp.out test.out
+
+test2:
+	make
+	gtime -f "%Us %MkB" ./a.out < test2.in
