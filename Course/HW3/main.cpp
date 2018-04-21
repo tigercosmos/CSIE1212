@@ -286,10 +286,6 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
     return evaluate(&this_board, true);
   }
 
-  // if (depth == 5) {
-  //   return evaluate(&this_board, false);
-  // }
-
   vector<vector<int>> next_sets = find_next_sets(emptys);
   if (round == CIRCLE_TURN) {
     int best_val = -INF;
