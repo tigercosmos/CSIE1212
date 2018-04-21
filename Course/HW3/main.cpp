@@ -1,14 +1,14 @@
 #include <algorithm>
 #include <bitset>
 #include <iostream>
+#include <map>
 #include <new>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <map>
 using namespace std;
 #define ull unsigned long long
-#define INF 100000
+#define INF 1000000
 
 enum GamePiece { CIRCLE_PIECE = 1, FORK_PIECE = 2 };
 enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
@@ -295,7 +295,7 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
       move_piece(&next_board, next_sets[i][1], CIRCLE_TURN);
       int next_result;
       // auto search = umap.find(next_board);
-      // if (search != umap.end()) {        
+      // if (search != umap.end()) {
       //   next_result = search->second;
       // } else {
       next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
