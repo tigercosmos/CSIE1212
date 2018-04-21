@@ -34,9 +34,8 @@ unordered_map<string, int> value_table = {
     {".OO.O", 50},
     {".OOO.", 50},
     {"O..OO", 50},
-    {"O.O.OO", 50},
-    {"O.OO.O", 50},
-    {"O.OOO.", 50},
+    {"O.O.O", 50},
+    {"O.OO.", 50},
     {"OO..O", 50},
     {"OO.O.", 50},
     {"OOO..", 50},
@@ -76,9 +75,8 @@ unordered_map<string, int> value_table = {
     {".XX.X", -50},
     {".XXX.", -50},
     {"X..XX", -50},
-    {"X.X.XX", -50},
-    {"X.XX.X", -50},
-    {"X.XXX.", -50},
+    {"X.X.X", -50},
+    {"X.XX.", -50},
     {"XX..X", -50},
     {"XX.X.", -50},
     {"XXX..", -50},
@@ -99,27 +97,13 @@ unordered_map<string, int> value_table = {
     {"...XX", -10},
 };
 
-// void printVector(vector<int> v) {
-//   for (int i = 0; i < v.size(); i++) {
-//     cout << v[i] << " ";
-//   }
-//   cout << endl;
-// }
-
-// void printVectorVector(vector<vector<int>> v) {
-//   for (int i = 0; i < v.size(); i++) {
-//     cout << "[" << v[i][0] << ", " << v[i][1] << "] ";
-//   }
-//   cout << endl;
-// }
-
 void print_win(int val) {
-  if (val == 0) {
-    cout << "Draw" << endl;
-  } else if (val > 0) {
+  if (val < -500) {
+    cout << "X win" << endl;
+  } else if (val > 500) {
     cout << "O win" << endl;
   } else {
-    cout << "X win" << endl;
+    cout << "Draw" << endl;
   }
 }
 
@@ -295,13 +279,13 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
       move_piece(&next_board, next_sets[i][0], CIRCLE_TURN);
       move_piece(&next_board, next_sets[i][1], CIRCLE_TURN);
       int next_result;
-      auto search = umap.find(this_board);
-      if (search != umap.end()) {
-        next_result = search->second;
-      } else {
+      // auto search = umap.find(this_board);
+      // if (search != umap.end()) {
+      //   next_result = search->second;
+      // } else {
         next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
-        umap.insert({next_board, next_result});
-      }
+      //   umap.insert({next_board, next_result});
+      // }
       best_val = max(best_val, next_result);
       alpha = max(alpha, best_val);
       if (beta <= alpha)
@@ -316,13 +300,13 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
       move_piece(&next_board, next_sets[i][0], FORK_TURN);
       move_piece(&next_board, next_sets[i][1], FORK_TURN);
       int next_result;
-      auto search = umap.find(this_board);
-      if (search != umap.end()) {
-        next_result = search->second;
-      } else {
+      // auto search = umap.find(this_board);
+      // if (search != umap.end()) {
+      //   next_result = search->second;
+      // } else {
         next_result = who_win(depth + 1, next_board, CIRCLE_TURN, alpha, beta);
-        umap.insert({next_board, next_result});
-      }
+      //   umap.insert({next_board, next_result});
+      // }
       best_val = min(best_val, next_result);
       beta = min(beta, best_val);
       if (beta <= alpha)
