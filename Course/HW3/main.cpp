@@ -78,7 +78,7 @@ void count_lines(const ull *board, int *circle, int *fork) {
       tmp <<= col * 2 + 10 * row;
       if (*board & tmp) {
         line_row_count_O += 1;
-      } else {
+      } else if (*board & tmp << 1) {
         line_row_count_X -= 1;
       }
 
@@ -87,7 +87,7 @@ void count_lines(const ull *board, int *circle, int *fork) {
       tmp <<= col * 10 + 2 * row;
       if (*board & tmp)
         line_col_count_O += 1;
-      else
+      else if (*board & tmp << 1)
         line_col_count_X -= 1;
     }
     if (line_col_count_O >= 4) {
@@ -116,11 +116,11 @@ void count_lines(const ull *board, int *circle, int *fork) {
     tmp2 <<= diagonal_right[i] * 2;
     if (*board & tmp1)
       line_diagonal_left_count_O += 1;
-    else
+    else if (*board & tmp1 << 1)
       line_diagonal_left_count_X -= 1;
     if (*board & tmp2)
       line_diagonal_right_count_O += 1;
-    else
+    else if (*board & tmp2 << 1)
       line_diagonal_right_count_X -= 1;
   }
   if (line_diagonal_left_count_O >= 4) {
@@ -154,9 +154,9 @@ GameResult evaluate(ull board, bool isFinal) {
   if (circle >= 4) {
     return CIRCLE_WIN;
   }
-  // if (fork >= 3) {
-  //   return FORK_WIN;
-  // }
+  if (fork >= 4) {
+    return FORK_WIN;
+  }
   return ING;
 }
 
@@ -214,7 +214,7 @@ GameResult who_win(ull board, GameTurn round) {
     for (int i = 0; i < emptys.size(); i++) {
       move_piece(&this_board, emptys[i], FORK_TURN);
     }
-    result = evaluate(board, true);
+    result = evaluate(this_board, true);
   } else {
     auto search = umap.find(this_board);
     if (search != umap.end()) {
