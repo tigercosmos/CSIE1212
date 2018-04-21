@@ -32,7 +32,8 @@
         "sstream": "cpp",
         "cmath": "cpp",
         "*.tcc": "cpp",
-        "array": "cpp"
+        "array": "cpp",
+        "limits": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }
