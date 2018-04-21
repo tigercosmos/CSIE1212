@@ -14,31 +14,31 @@ enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
 
 unordered_map<ull, int> umap;
 unordered_map<string, int> value_table = {
-    {"OOOOO", 530},
+    {"OOOOO", 5000},
 
-    {"XOOOO", 530},
-    {"OXOOO", 530},
-    {"OOXOO", 530},
-    {"OOOXO", 530},
-    {"OOOOX", 530},
+    {"XOOOO", 5000},
+    {"OXOOO", 5000},
+    {"OOXOO", 5000},
+    {"OOOXO", 5000},
+    {"OOOOX", 5000},
 
-    {".OOOO", 530},
-    {"OOOO.", 530},
-    {"O.OOO", 530},
-    {"OOO.O", 530},
-    {"OO.OO", 530},
+    {".OOOO", 5000},
+    {"OOOO.", 5000},
+    {"O.OOO", 5000},
+    {"OOO.O", 5000},
+    {"OO.OO", 5000},
 
-    {".OOO.", 50},
-    {"..OOO", 50},
-    {".O.OO", 50},
-    {".OO.O", 50},
-    {".OOO.", 50},
-    {"O..OO", 50},
-    {"O.O.O", 50},
-    {"O.OO.", 50},
-    {"OO..O", 50},
-    {"OO.O.", 50},
-    {"OOO..", 50},
+    {".OOO.", 80},
+    {"..OOO", 80},
+    {".O.OO", 80},
+    {".OO.O", 80},
+    {".OOO.", 80},
+    {"O..OO", 80},
+    {"O.O.O", 80},
+    {"O.OO.", 80},
+    {"OO..O", 80},
+    {"OO.O.", 80},
+    {"OOO..", 80},
 
     {"OOO.X", 40},
     {"OO.OX", 40},
@@ -55,31 +55,31 @@ unordered_map<string, int> value_table = {
     {"..OO.", 10},
     {"...OO", 10},
     //
-    {"XXXXX", -530},
+    {"XXXXX", -5000},
 
-    {"XXXXO", -530},
-    {"XXXOX", -530},
-    {"XXOXX", -530},
-    {"XOXXX", -530},
-    {"OXXXX", -530},
+    {"XXXXO", -5000},
+    {"XXXOX", -5000},
+    {"XXOXX", -5000},
+    {"XOXXX", -5000},
+    {"OXXXX", -5000},
 
-    {".XXXX", -530},
-    {"XXXX.", -530},
-    {"X.XXX", -530},
-    {"XXX.X", -530},
-    {"XX.XX", -530},
+    {".XXXX", -5000},
+    {"XXXX.", -5000},
+    {"X.XXX", -5000},
+    {"XXX.X", -5000},
+    {"XX.XX", -5000},
 
-    {".XXX.", -50},
-    {"..XXX", -50},
-    {".X.XX", -50},
-    {".XX.X", -50},
-    {".XXX.", -50},
-    {"X..XX", -50},
-    {"X.X.X", -50},
-    {"X.XX.", -50},
-    {"XX..X", -50},
-    {"XX.X.", -50},
-    {"XXX..", -50},
+    {".XXX.", -80},
+    {"..XXX", -80},
+    {".X.XX", -80},
+    {".XX.X", -80},
+    {".XXX.", -80},
+    {"X..XX", -80},
+    {"X.X.X", -80},
+    {"X.XX.", -80},
+    {"XX..X", -80},
+    {"XX.X.", -80},
+    {"XXX..", -80},
 
     {"XXX.O", -40},
     {"XX.XO", -40},
@@ -97,10 +97,16 @@ unordered_map<string, int> value_table = {
     {"...XX", -10},
 };
 
+unordered_map<string, int> final_table = {
+    {"OOOOO", 5300},  {"XOOOO", 5300},  {"OXOOO", 5300},  {"OOXOO", 5300},
+    {"OOOXO", 5300},  {"OOOOX", 5300},  {"XXXXX", -5300}, {"XXXXO", -5300},
+    {"XXXOX", -5300}, {"XXOXX", -5300}, {"XOXXX", -5300}, {"OXXXX", -5300},
+};
+
 void print_win(int val) {
-  if (val < -500) {
+  if (val < -4000) {
     cout << "X win" << endl;
-  } else if (val > 500) {
+  } else if (val > 4000) {
     cout << "O win" << endl;
   } else {
     cout << "Draw" << endl;
@@ -189,7 +195,7 @@ vector<vector<int>> find_next_sets(vector<int> &v) {
   return tmp;
 }
 
-int evaluate(ull *board) {
+int evaluate(ull *board, bool isFinal) {
   int value = 0;
   vector<string> lines;
   string line1;
@@ -249,11 +255,19 @@ int evaluate(ull *board) {
     lines.push_back(line1);
     lines.push_back(line2);
   }
-
-  for (int i = 0; i < lines.size(); i++) {
-    auto search = value_table.find(lines[i]);
-    if (search != value_table.end()) {
-      value += search->second;
+  if (isFinal) {
+    for (int i = 0; i < lines.size(); i++) {
+      auto search = final_table.find(lines[i]);
+      if (search != final_table.end()) {
+        value += search->second;
+      }
+    }
+  } else {
+    for (int i = 0; i < lines.size(); i++) {
+      auto search = value_table.find(lines[i]);
+      if (search != value_table.end()) {
+        value += search->second;
+      }
     }
   }
   return value;
@@ -264,12 +278,16 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
   int result;
   vector<int> emptys = find_empty(&this_board);
 
-  if (emptys.size() == 3 || depth == 5) {
+  if (emptys.size() == 3) {
     for (int i = 0; i < emptys.size(); i++) {
       move_piece(&this_board, emptys[i], FORK_TURN);
     }
-    return evaluate(&this_board);
+    return evaluate(&this_board, true);
   }
+
+  // if (depth == 5) {
+  //   return evaluate(&this_board, false);
+  // }
 
   vector<vector<int>> next_sets = find_next_sets(emptys);
   if (round == CIRCLE_TURN) {
@@ -279,11 +297,11 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
       move_piece(&next_board, next_sets[i][0], CIRCLE_TURN);
       move_piece(&next_board, next_sets[i][1], CIRCLE_TURN);
       int next_result;
-      // auto search = umap.find(this_board);
-      // if (search != umap.end()) {
+      // auto search = umap.find(next_board);
+      // if (search != umap.end()) {        
       //   next_result = search->second;
       // } else {
-        next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
+      next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
       //   umap.insert({next_board, next_result});
       // }
       best_val = max(best_val, next_result);
@@ -300,11 +318,11 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
       move_piece(&next_board, next_sets[i][0], FORK_TURN);
       move_piece(&next_board, next_sets[i][1], FORK_TURN);
       int next_result;
-      // auto search = umap.find(this_board);
+      // auto search = umap.find(next_board);
       // if (search != umap.end()) {
       //   next_result = search->second;
       // } else {
-        next_result = who_win(depth + 1, next_board, CIRCLE_TURN, alpha, beta);
+      next_result = who_win(depth + 1, next_board, CIRCLE_TURN, alpha, beta);
       //   umap.insert({next_board, next_result});
       // }
       best_val = min(best_val, next_result);
