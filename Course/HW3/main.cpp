@@ -68,43 +68,46 @@ inline GameTurn get_round(ull board) {
 GameResult evaluate(ull board) {
   int result_counter = 0;
   for (int row = 0; row < 5; row++) {
-    char line_row_count = 0;
-    char line_col_count = 0;
+    char line_row_count_O = 0;
+    char line_col_count_O = 0;
+    char line_row_count_X = 0;
+    char line_col_count_X = 0;
 
     for (int col = 0; col < 5; col++) {
       // for row
       ull tmp = 1;
       tmp <<= col * 2 + 10 * row;
       if (board & tmp) {
-        line_row_count += 1;
+        line_row_count_O += 1;
       } else {
-        line_row_count -= 1;
+        line_row_count_X -= 1;
       }
 
       // for column
       tmp = 1;
       tmp <<= col * 10 + 2 * row;
       if (board & tmp)
-        line_col_count += 1;
+        line_col_count_O += 1;
       else
-        line_col_count -= 1;
+        line_col_count_X -= 1;
     }
-    if (line_col_count >= 3) {
+    if (line_col_count_O >= 4) {
       result_counter += 1;
-    } else if (line_col_count <= -3) {
+    } else if (line_col_count_X <= -4) {
       result_counter -= 1;
     }
-    if (line_row_count >= 3) {
+    if (line_row_count_O >= 4) {
       result_counter += 1;
-
-    } else if (line_row_count <= -3) {
+    } else if (line_row_count_X <= -4) {
       result_counter -= 1;
     }
   }
 
   // for diagonal
-  char line_diagonal_left_count = 0;
-  char line_diagonal_right_count = 0;
+  char line_diagonal_left_count_O = 0;
+  char line_diagonal_left_count_X = 0;
+  char line_diagonal_right_count_O = 0;
+  char line_diagonal_right_count_X = 0;
   int diagonal_left[5] = {0, 6, 12, 18, 24};
   int diagonal_right[5] = {4, 8, 12, 16, 20};
   for (int i = 0; i < 5; i++) {
@@ -113,22 +116,22 @@ GameResult evaluate(ull board) {
     tmp1 <<= diagonal_left[i] * 2;
     tmp2 <<= diagonal_right[i] * 2;
     if (board & tmp1)
-      line_diagonal_left_count += 1;
+      line_diagonal_left_count_O += 1;
     else
-      line_diagonal_left_count -= 1;
+      line_diagonal_left_count_X -= 1;
     if (board & tmp2)
-      line_diagonal_right_count += 1;
+      line_diagonal_right_count_O += 1;
     else
-      line_diagonal_right_count -= 1;
+      line_diagonal_right_count_X -= 1;
   }
-  if (line_diagonal_left_count >= 3) {
+  if (line_diagonal_left_count_O >= 4) {
     result_counter += 1;
-  } else if (line_diagonal_left_count <= -3) {
+  } else if (line_diagonal_left_count_X <= -4) {
     result_counter -= 1;
   }
-  if (line_diagonal_right_count >= 3) {
+  if (line_diagonal_right_count_O >= 4) {
     result_counter += 1;
-  } else if (line_diagonal_right_count <= -3) {
+  } else if (line_diagonal_right_count_X <= -4) {
     result_counter -= 1;
   }
   if (result_counter > 0)
