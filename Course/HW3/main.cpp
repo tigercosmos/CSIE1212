@@ -13,6 +13,47 @@ enum GameResult { DRAW = 0, CIRCLE_WIN = 1, FORK_WIN = 2, ING = 4 };
 enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
 
 unordered_map<ull, GameResult> umap;
+unordered_map<string, int> value_table = {
+    {"OOOOO", 240},
+    {"OOOOX", 230},
+    {"XOOOO", 230},
+    {".OOOO", 230},
+    {"OOOO.", 230},
+    {"O.OOO", 230},
+    {"OOO.O", 230},
+    {"OO.OO", 230},
+
+    {".OOO.", 50},
+    {"..OOO", 50},
+    {"OOO..", 50},
+    {"OOO.X", 40},
+    {"X.OOO", 40},
+
+    {"XOOO.", 30},
+    {".OOOX", 30},
+    {".OO..", 10},
+    {"..OO.", 10},
+    //
+    {"XXXXX", -240},
+    {"XXXXO", -230},
+    {"OXXXX", -230},
+    {".XXXX", -230},
+    {"XXXX.", -230},
+    {"X.XXX", -230},
+    {"XXX.X", -230},
+    {"XX.XX", -230},
+
+    {".XXX.", -50},
+    {"..XXX", -50},
+    {"XXX..", -50},
+    {"XXX.O", -40},
+    {"O.XXX", -40},
+
+    {"OXXX.", -30},
+    {".XXXO", -30},
+    {".XX..", -10},
+    {"..XX.", -10},
+};
 
 // void printVector(vector<int> v) {
 //   for (int i = 0; i < v.size(); i++) {
@@ -136,28 +177,18 @@ void count_lines(const ull *board, int *circle, int *fork) {
 }
 
 // when the board is filled with pieces, and then evaluate the result.
-GameResult evaluate(ull board, bool isFinal) {
+GameResult getEndResult(ull board) {
   int circle = 0;
   int fork = 0;
 
   count_lines(&board, &circle, &fork);
 
-  if (isFinal) {
-    if (circle > fork)
-      return CIRCLE_WIN;
-    if (circle < fork)
-      return FORK_WIN;
-    else
-      return DRAW;
-  }
-
-  if (circle >= 4) {
+  if (circle > fork)
     return CIRCLE_WIN;
-  }
-  if (fork >= 4) {
+  if (circle < fork)
     return FORK_WIN;
-  }
-  return ING;
+  else
+    return DRAW;
 }
 
 vector<int> find_empty(ull *board) {
@@ -206,6 +237,77 @@ vector<vector<int>> find_next_sets(vector<int> &v) {
   return tmp;
 }
 
+int evaluate(ull *board) {
+  int value = 0;
+  vector<string> lines;
+  string line1;
+  string line2;
+  for (int row = 0; row < 5; row++) {
+    line1 = "";
+    line2 = "";
+    for (int col = 0; col < 5; col++) {
+      // for row
+      ull tmp = 1;
+      tmp <<= col * 2 + 10 * row;
+      if (*board & tmp) {
+        line1 += "O";
+      } else if (*board & tmp << 1) {
+        line1 += "X";
+      } else {
+        line1 += ".";
+      }
+
+      // for column
+      tmp = 1;
+      tmp <<= col * 10 + 2 * row;
+      if (*board & tmp) {
+        line2 += "O";
+      } else if (*board & tmp << 1) {
+        line2 += "X";
+      } else {
+        line2 += ".";
+      }
+    }
+    lines.push_back(line1);
+    lines.push_back(line2);
+  }
+
+  line1 = "";
+  line2 = "";
+  int diagonal_left[5] = {0, 6, 12, 18, 24};
+  int diagonal_right[5] = {4, 8, 12, 16, 20};
+  for (int i = 0; i < 5; i++) {
+    ull tmp1 = 1;
+    ull tmp2 = 1;
+    tmp1 <<= diagonal_left[i] * 2;
+    tmp2 <<= diagonal_right[i] * 2;
+    if (*board & tmp1)
+      line1 += "O";
+    else if (*board & tmp1 << 1)
+      line1 += "X";
+    else
+      line1 += ".";
+    if (*board & tmp2)
+      line2 += "O";
+    else if (*board & tmp2 << 1)
+      line2 += "X";
+    else {
+      line2 += ".";
+    }
+    lines.push_back(line1);
+    lines.push_back(line2);
+  }
+
+  for (int i = 0; i < lines.size(); i++) {
+    auto search = value_table.find(lines[i]);
+    if (search != value_table.end()) {
+      cout << "find:" << search->first << endl;
+      value += search->second;
+    }
+  }
+  return value;
+}
+
 GameResult who_win(ull board, GameTurn round) {
   ull this_board = board;
   GameResult result;
@@ -214,16 +316,11 @@ GameResult who_win(ull board, GameTurn round) {
     for (int i = 0; i < emptys.size(); i++) {
       move_piece(&this_board, emptys[i], FORK_TURN);
     }
-    result = evaluate(this_board, true);
+    result = getEndResult(this_board);
   } else {
     auto search = umap.find(this_board);
     if (search != umap.end()) {
       return search->second;
-    }
-
-    auto checking = evaluate(board, false);
-    if (checking != ING) {
-      return checking;
     }
 
     vector<vector<int>> next_sets = find_next_sets(emptys);
@@ -275,6 +372,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < games; i++) {
     ull board = input_game();
     GameTurn round = get_round(board);
+    
     GameResult result = who_win(board, round);
     if (result == DRAW) {
       cout << "Draw" << endl;
