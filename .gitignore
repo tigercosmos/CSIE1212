@@ -2,5 +2,5 @@
 *.out
 *.DS_Store
 *.output
-!/**/test.out
+!**/test/*.out
 !Course/HW2/test_data/*.out
