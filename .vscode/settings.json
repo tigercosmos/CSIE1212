@@ -33,7 +33,8 @@
         "cmath": "cpp",
         "*.tcc": "cpp",
         "array": "cpp",
-        "limits": "cpp"
+        "limits": "cpp",
+        "optional": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }
