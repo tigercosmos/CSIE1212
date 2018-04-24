@@ -16,9 +16,9 @@ using namespace std;
 
 enum GamePiece { NONE_PIECE = 0, CIRCLE_PIECE = 1, FORK_PIECE = 2 };
 enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
+
+// for rotate and flip
 vector<vector<int>> boards_rf = {
-    // {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-    //  13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24},
     {4,  9,  14, 19, 24, 3,  8,  13, 18, 23, 2,  7, 12,
      17, 22, 1,  6,  11, 16, 21, 0,  5,  10, 15, 20},
     {24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12,
@@ -57,94 +57,11 @@ struct NodeInfoHasher {
 };
 
 unordered_map<NodeInfo, int, NodeInfoHasher> umap;
-unordered_map<string, int> value_table = {
-    {"OOOOO", 5000},
-
-    {"XOOOO", 5000},
-    {"OXOOO", 5000},
-    {"OOXOO", 5000},
-    {"OOOXO", 5000},
-    {"OOOOX", 5000},
-
-    {".OOOO", 5000},
-    {"OOOO.", 5000},
-    {"O.OOO", 5000},
-    {"OOO.O", 5000},
-    {"OO.OO", 5000},
-
-    {".OOO.", 80},
-    {"..OOO", 80},
-    {".O.OO", 80},
-    {".OO.O", 80},
-    {".OOO.", 80},
-    {"O..OO", 80},
-    {"O.O.O", 80},
-    {"O.OO.", 80},
-    {"OO..O", 80},
-    {"OO.O.", 80},
-    {"OOO..", 80},
-
-    {"OOO.X", 40},
-    {"OO.OX", 40},
-    {"O.OOX", 40},
-    {".OOOX", 40},
-
-    {"X.OOO", 40},
-    {"XO.OO", 40},
-    {"XOO.O", 40},
-    {"XOOO.", 40},
-
-    {"OO...", 10},
-    {".OO..", 10},
-    {"..OO.", 10},
-    {"...OO", 10},
-    //
-    {"XXXXX", -5000},
-
-    {"XXXXO", -5000},
-    {"XXXOX", -5000},
-    {"XXOXX", -5000},
-    {"XOXXX", -5000},
-    {"OXXXX", -5000},
-
-    {".XXXX", -5000},
-    {"XXXX.", -5000},
-    {"X.XXX", -5000},
-    {"XXX.X", -5000},
-    {"XX.XX", -5000},
-
-    {".XXX.", -80},
-    {"..XXX", -80},
-    {".X.XX", -80},
-    {".XX.X", -80},
-    {".XXX.", -80},
-    {"X..XX", -80},
-    {"X.X.X", -80},
-    {"X.XX.", -80},
-    {"XX..X", -80},
-    {"XX.X.", -80},
-    {"XXX..", -80},
-
-    {"XXX.O", -40},
-    {"XX.XO", -40},
-    {"X.XXO", -40},
-    {".XXXO", -40},
-
-    {"O.XXX", -40},
-    {"OX.XX", -40},
-    {"OXX.X", -40},
-    {"OXXX.", -40},
-
-    {"XX...", -10},
-    {".XX..", -10},
-    {"..XX.", -10},
-    {"...XX", -10},
-};
 
 unordered_map<string, int> final_table = {
-    {"OOOOO", 5300},  {"XOOOO", 5300},  {"OXOOO", 5300},  {"OOXOO", 5300},
-    {"OOOXO", 5300},  {"OOOOX", 5300},  {"XXXXX", -5300}, {"XXXXO", -5300},
-    {"XXXOX", -5300}, {"XXOXX", -5300}, {"XOXXX", -5300}, {"OXXXX", -5300},
+    {"OOOOO", 5000},  {"XOOOO", 5000},  {"OXOOO", 5000},  {"OOXOO", 5000},
+    {"OOOXO", 5000},  {"OOOOX", 5000},  {"XXXXX", -5000}, {"XXXXO", -5000},
+    {"XXXOX", -5000}, {"XXOXX", -5000}, {"XOXXX", -5000}, {"OXXXX", -5000},
 };
 
 void print_board(ull board) {
@@ -165,9 +82,9 @@ void print_board(ull board) {
 }
 
 inline void print_win(int val) {
-  if (val < -4000) {
+  if (val <= -5000) {
     cout << "X win" << endl;
-  } else if (val > 4000) {
+  } else if (val >= 5000) {
     cout << "O win" << endl;
   } else {
     cout << "Draw" << endl;
@@ -215,6 +132,7 @@ inline void save_rotate_flip_boards(const NodeInfo *info, const int *value) {
   }
 }
 
+// Note: 如果讓第一個元素在最左邊的話，bit元素運算會更快，因為只要一直往左邊推就好。
 inline static ull input_game() {
   ull board = 0;
   for (int row = 0; row < 5; row++) {
@@ -236,7 +154,6 @@ inline static ull input_game() {
   return board;
 }
 
-// round count from 0
 inline void get_round(ull board, GameTurn *turn, int *round) {
   int counter = 0;
   for (int i = 0; i < 50; i++) {
@@ -439,8 +356,8 @@ int who_win(int depth, ull board, GameTurn turn, int alpha, int beta,
         boards.insert({0, next_board});
       }
     }
-    for (auto i = boards.begin(); i != boards.end(); i++) {
-      ull next_board = i->second;
+    for (auto it = boards.begin(); it != boards.end(); it++) {
+      ull next_board = it->second;
       int next_result;
       NodeInfo nodeinfo = NodeInfo(next_board, alpha, beta);
       auto search = umap.find(nodeinfo);
