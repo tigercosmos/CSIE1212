@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <bitset>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <new>
@@ -13,7 +14,29 @@ using namespace std;
 enum GamePiece { CIRCLE_PIECE = 1, FORK_PIECE = 2 };
 enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
 
-unordered_map<ull, int> umap;
+struct NodeInfo {
+  NodeInfo(ull board, int alpha, int beta) {
+    _board = board;
+    _alpha = alpha;
+    _beta = beta;
+  };
+  ull _board;
+  int _alpha;
+  int _beta;
+  bool operator==(const NodeInfo &other) const {
+    return (_board == other._board && _alpha == other._alpha &&
+            _beta == other._beta);
+  }
+};
+
+struct NodeInfoHasher {
+  size_t operator()(const NodeInfo &k) const {
+    return ((hash<ull>()(k._board) ^ (hash<int>()(k._alpha) << 1)) >> 1) ^
+           (hash<int>()(k._beta) << 1);
+  }
+};
+
+unordered_map<NodeInfo, int, NodeInfoHasher> umap;
 unordered_map<string, int> value_table = {
     {"OOOOO", 5000},
 
@@ -316,33 +339,37 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
       move_piece(&next_board, next_sets[i][0], CIRCLE_TURN);
       move_piece(&next_board, next_sets[i][1], CIRCLE_TURN);
       int next_result;
-      // auto search = umap.find(next_board);
-      // if (search != umap.end()) {
-      //   next_result = search->second;
-      // } else {
-      next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
-      //   umap.insert({next_board, next_result});
-      // }
+      NodeInfo nodeinfo = NodeInfo(next_board, alpha, beta);
+      auto search = umap.find(nodeinfo);
+      if (search != umap.end()) {
+        next_result = search->second;
+      } else {
+        next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
+        umap.insert({nodeinfo, next_result});
+      }
       best_val = max(best_val, next_result);
       alpha = max(alpha, best_val);
       if (beta <= alpha)
         break;
     }
     return best_val;
-  } else if (round == FORK_TURN) {
+  }
+
+  else if (round == FORK_TURN) {
     int best_val = INF;
     for (int i = 0; i < next_sets.size(); i++) {
       ull next_board = this_board;
       move_piece(&next_board, next_sets[i][0], FORK_TURN);
       move_piece(&next_board, next_sets[i][1], FORK_TURN);
       int next_result;
-      // auto search = umap.find(next_board);
-      // if (search != umap.end()) {
-      //   next_result = search->second;
-      // } else {
-      next_result = who_win(depth + 1, next_board, CIRCLE_TURN, alpha, beta);
-      //   umap.insert({next_board, next_result});
-      // }
+      NodeInfo nodeinfo = NodeInfo(next_board, alpha, beta);
+      auto search = umap.find(nodeinfo);
+      if (search != umap.end()) {
+        next_result = search->second;
+      } else {
+        next_result = who_win(depth + 1, next_board, CIRCLE_TURN, alpha, beta);
+        umap.insert({nodeinfo, next_result});
+      }
       best_val = min(best_val, next_result);
       beta = min(beta, best_val);
       if (beta <= alpha)
