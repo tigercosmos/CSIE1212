@@ -299,7 +299,7 @@ inline vector<vector<int>> find_next_sets(vector<int> &v) {
   return tmp;
 }
 
-inline int evaluate(ull *board, bool isFinal) {
+inline int evaluate(ull *board) {
   int value = 0;
   vector<string> lines;
   string line1;
@@ -359,26 +359,19 @@ inline int evaluate(ull *board, bool isFinal) {
     lines.push_back(line1);
     lines.push_back(line2);
   }
-  if (isFinal) {
-    for (int i = 0; i < lines.size(); i++) {
-      auto search = final_table.find(lines[i]);
-      if (search != final_table.end()) {
-        value += search->second;
-      }
-    }
-    if (value > 0) {
-      value = 5000;
-    } else if (value < 0) {
-      value = -5000;
-    }
-  } else {
-    for (int i = 0; i < lines.size(); i++) {
-      auto search = value_table.find(lines[i]);
-      if (search != value_table.end()) {
-        value += search->second;
-      }
+
+  for (int i = 0; i < lines.size(); i++) {
+    auto search = final_table.find(lines[i]);
+    if (search != final_table.end()) {
+      value += search->second;
     }
   }
+  if (value > 0) {
+    value = 5000;
+  } else if (value < 0) {
+    value = -5000;
+  }
+
   return value;
 }
 
@@ -392,16 +385,25 @@ int who_win(int depth, ull board, GameTurn turn, int alpha, int beta,
     for (int i = 0; i < emptys.size(); i++) {
       move_piece(&this_board, emptys[i], FORK_TURN);
     }
-    return evaluate(&this_board, true);
+    return evaluate(&this_board);
   }
 
   vector<vector<int>> next_sets = find_next_sets(emptys);
   if (turn == CIRCLE_TURN) {
     int best_val = -INF;
+    multimap<int, ull> boards;
     for (int i = 0; i < next_sets.size(); i++) {
       ull next_board = this_board;
       move_piece(&next_board, next_sets[i][0], CIRCLE_TURN);
       move_piece(&next_board, next_sets[i][1], CIRCLE_TURN);
+      if (round <= 5) {
+        boards.insert({evaluate(&next_board), next_board});
+      } else {
+        boards.insert({0, next_board});
+      }
+    }
+    for (auto i = boards.rbegin(); i != boards.rend(); i++) {
+      ull next_board = i->second;
       int next_result;
       NodeInfo nodeinfo = NodeInfo(next_board, alpha, beta);
       auto search = umap.find(nodeinfo);
@@ -426,10 +428,19 @@ int who_win(int depth, ull board, GameTurn turn, int alpha, int beta,
 
   else if (turn == FORK_TURN) {
     int best_val = INF;
+    multimap<int, ull> boards;
     for (int i = 0; i < next_sets.size(); i++) {
       ull next_board = this_board;
       move_piece(&next_board, next_sets[i][0], FORK_TURN);
       move_piece(&next_board, next_sets[i][1], FORK_TURN);
+      if (round <= 5) {
+        boards.insert({evaluate(&next_board), next_board});
+      } else {
+        boards.insert({0, next_board});
+      }
+    }
+    for (auto i = boards.begin(); i != boards.end(); i++) {
+      ull next_board = i->second;
       int next_result;
       NodeInfo nodeinfo = NodeInfo(next_board, alpha, beta);
       auto search = umap.find(nodeinfo);
