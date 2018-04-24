@@ -1,3 +1,6 @@
+/*
+** Liu, An-chi @ Copyright
+*/
 #include <algorithm>
 #include <bitset>
 #include <functional>
@@ -14,8 +17,8 @@ using namespace std;
 enum GamePiece { NONE_PIECE = 0, CIRCLE_PIECE = 1, FORK_PIECE = 2 };
 enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
 vector<vector<int>> boards_rf = {
-    {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-     13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24},
+    // {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+    //  13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24},
     {4,  9,  14, 19, 24, 3,  8,  13, 18, 23, 2,  7, 12,
      17, 22, 1,  6,  11, 16, 21, 0,  5,  10, 15, 20},
     {24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12,
@@ -161,7 +164,7 @@ void print_board(ull board) {
   }
 }
 
-void print_win(int val) {
+inline void print_win(int val) {
   if (val < -4000) {
     cout << "X win" << endl;
   } else if (val > 4000) {
@@ -171,7 +174,7 @@ void print_win(int val) {
   }
 }
 
-void save_rotate_flip_boards(const NodeInfo *info, const int *value) {
+inline void save_rotate_flip_boards(const NodeInfo *info, const int *value) {
   ull board = info->_board;
   NodeInfo newInfo = NodeInfo(board, info->_alpha, info->_beta);
   vector<GamePiece> this_board;
@@ -188,6 +191,8 @@ void save_rotate_flip_boards(const NodeInfo *info, const int *value) {
       }
     }
   }
+  // origin one
+  umap.insert({newInfo, *value});
   for (int i = 0; i < boards_rf.size(); i++) {
     ull new_board = 0;
     for (int j = 0; j < 25; j++) {
@@ -232,7 +237,7 @@ inline static ull input_game() {
 }
 
 // round count from 0
-inline GameTurn get_round(ull board) {
+inline void get_round(ull board, GameTurn *turn, int *round) {
   int counter = 0;
   for (int i = 0; i < 50; i++) {
     ull tmp = 1;
@@ -241,12 +246,14 @@ inline GameTurn get_round(ull board) {
       counter++;
   }
   if ((counter / 2) % 2 == 0) {
-    return CIRCLE_TURN;
+    *turn = CIRCLE_TURN;
+  } else {
+    *turn = FORK_TURN;
   }
-  return FORK_TURN;
+  *round = (counter / 2);
 }
 
-vector<int> find_empty(ull *board) {
+inline vector<int> find_empty(ull *board) {
   vector<int> v;
   ull tmp = 1;
   tmp = (tmp << 50) - 1;
@@ -270,7 +277,7 @@ vector<int> find_empty(ull *board) {
   return v;
 }
 
-void move_piece(ull *board, int position, GameTurn turn) {
+inline void move_piece(ull *board, int position, GameTurn turn) {
   ull piece;
   if (turn == CIRCLE_TURN) {
     piece = CIRCLE_PIECE;
@@ -281,7 +288,7 @@ void move_piece(ull *board, int position, GameTurn turn) {
   *board ^= piece;
 }
 
-vector<vector<int>> find_next_sets(vector<int> &v) {
+inline vector<vector<int>> find_next_sets(vector<int> &v) {
   vector<vector<int>> tmp;
   for (int i = 0; i < v.size(); i++) {
     for (int j = i + 1; j < v.size(); j++) {
@@ -292,7 +299,7 @@ vector<vector<int>> find_next_sets(vector<int> &v) {
   return tmp;
 }
 
-int evaluate(ull *board, bool isFinal) {
+inline int evaluate(ull *board, bool isFinal) {
   int value = 0;
   vector<string> lines;
   string line1;
@@ -375,7 +382,8 @@ int evaluate(ull *board, bool isFinal) {
   return value;
 }
 
-int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
+int who_win(int depth, ull board, GameTurn turn, int alpha, int beta,
+            int round) {
   ull this_board = board;
   int result;
   vector<int> emptys = find_empty(&this_board);
@@ -388,7 +396,7 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
   }
 
   vector<vector<int>> next_sets = find_next_sets(emptys);
-  if (round == CIRCLE_TURN) {
+  if (turn == CIRCLE_TURN) {
     int best_val = -INF;
     for (int i = 0; i < next_sets.size(); i++) {
       ull next_board = this_board;
@@ -400,8 +408,9 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
       if (search != umap.end()) {
         next_result = search->second;
       } else {
-        next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
-        if (depth < 3) {
+        next_result =
+            who_win(depth + 1, next_board, FORK_TURN, alpha, beta, round + 1);
+        if (round < 6 || depth < 2) {
           save_rotate_flip_boards(&nodeinfo, &next_result);
         } else {
           umap.insert({nodeinfo, next_result});
@@ -415,7 +424,7 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
     return best_val;
   }
 
-  else if (round == FORK_TURN) {
+  else if (turn == FORK_TURN) {
     int best_val = INF;
     for (int i = 0; i < next_sets.size(); i++) {
       ull next_board = this_board;
@@ -427,8 +436,9 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
       if (search != umap.end()) {
         next_result = search->second;
       } else {
-        next_result = who_win(depth + 1, next_board, CIRCLE_TURN, alpha, beta);
-        if (depth < 3) {
+        next_result =
+            who_win(depth + 1, next_board, CIRCLE_TURN, alpha, beta, round + 1);
+        if (round < 6 || depth < 2) {
           save_rotate_flip_boards(&nodeinfo, &next_result);
         } else {
           umap.insert({nodeinfo, next_result});
@@ -450,8 +460,10 @@ int main(int argc, char *argv[]) {
   cin >> games;
   for (int i = 0; i < games; i++) {
     ull board = input_game();
-    GameTurn round = get_round(board);
-    int result_val = who_win(0, board, round, -INF, +INF);
+    GameTurn turn;
+    int round;
+    get_round(board, &turn, &round);
+    int result_val = who_win(0, board, turn, -INF, +INF, round);
     print_win(result_val);
   }
 }
