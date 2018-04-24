@@ -11,8 +11,25 @@ using namespace std;
 #define ull unsigned long long
 #define INF 1000000
 
-enum GamePiece { CIRCLE_PIECE = 1, FORK_PIECE = 2 };
+enum GamePiece { NONE_PIECE = 0, CIRCLE_PIECE = 1, FORK_PIECE = 2 };
 enum GameTurn { CIRCLE_TURN = 0, FORK_TURN = 1 };
+vector<vector<int>> boards_rf = {
+    {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+     13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24},
+    {4,  9,  14, 19, 24, 3,  8,  13, 18, 23, 2,  7, 12,
+     17, 22, 1,  6,  11, 16, 21, 0,  5,  10, 15, 20},
+    {24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12,
+     11, 10, 9,  8,  7,  6,  5,  4,  3,  2,  1,  0},
+    {20, 15, 10, 5,  0,  21, 16, 11, 6,  1,  22, 17, 12,
+     7,  2,  23, 18, 13, 8,  3,  24, 19, 14, 9,  4},
+    {4,  3,  2,  1,  0,  9,  8,  7,  6,  5,  14, 13, 12,
+     11, 10, 19, 18, 17, 16, 15, 24, 23, 22, 21, 20},
+    {24, 19, 14, 9,  4,  23, 18, 13, 8,  3,  22, 17, 12,
+     7,  2,  21, 16, 11, 6,  1,  20, 15, 10, 5,  0},
+    {20, 21, 22, 23, 24, 15, 16, 17, 18, 19, 10, 11, 12,
+     13, 14, 5,  6,  7,  8,  9,  0,  1,  2,  3,  4},
+    {0,  5,  10, 15, 20, 1,  6,  11, 16, 21, 2,  7, 12,
+     17, 22, 3,  8,  13, 18, 23, 4,  9,  14, 19, 24}};
 
 struct NodeInfo {
   NodeInfo(ull board, int alpha, int beta) {
@@ -151,6 +168,45 @@ void print_win(int val) {
     cout << "O win" << endl;
   } else {
     cout << "Draw" << endl;
+  }
+}
+
+void save_rotate_flip_boards(const NodeInfo *info, const int *value) {
+  ull board = info->_board;
+  NodeInfo newInfo = NodeInfo(board, info->_alpha, info->_beta);
+  vector<GamePiece> this_board;
+  for (int row = 0; row < 5; row++) {
+    for (int col = 0; col < 5; col++) {
+      ull tmp = 1;
+      tmp <<= col * 2 + 10 * row;
+      if (board & tmp) {
+        this_board.push_back(CIRCLE_PIECE);
+      } else if (board & tmp << 1) {
+        this_board.push_back(FORK_PIECE);
+      } else {
+        this_board.push_back(NONE_PIECE);
+      }
+    }
+  }
+  for (int i = 0; i < boards_rf.size(); i++) {
+    ull new_board = 0;
+    for (int j = 0; j < 25; j++) {
+      ull piece = NONE_PIECE;
+      if (this_board[j] == CIRCLE_PIECE) {
+        piece = CIRCLE_PIECE;
+        piece <<= boards_rf[i][j];
+        new_board ^= piece;
+      } else if (this_board[j] == FORK_PIECE) {
+        piece = FORK_PIECE;
+        piece <<= boards_rf[i][j];
+        new_board ^= piece;
+      } else {
+        piece <<= boards_rf[i][j];
+        new_board ^= piece;
+      }
+    }
+    newInfo._board = new_board;
+    umap.insert({newInfo, *value});
   }
 }
 
@@ -345,7 +401,11 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
         next_result = search->second;
       } else {
         next_result = who_win(depth + 1, next_board, FORK_TURN, alpha, beta);
-        umap.insert({nodeinfo, next_result});
+        if (depth < 3) {
+          save_rotate_flip_boards(&nodeinfo, &next_result);
+        } else {
+          umap.insert({nodeinfo, next_result});
+        }
       }
       best_val = max(best_val, next_result);
       alpha = max(alpha, best_val);
@@ -368,7 +428,11 @@ int who_win(int depth, ull board, GameTurn round, int alpha, int beta) {
         next_result = search->second;
       } else {
         next_result = who_win(depth + 1, next_board, CIRCLE_TURN, alpha, beta);
-        umap.insert({nodeinfo, next_result});
+        if (depth < 3) {
+          save_rotate_flip_boards(&nodeinfo, &next_result);
+        } else {
+          umap.insert({nodeinfo, next_result});
+        }
       }
       best_val = min(best_val, next_result);
       beta = min(beta, best_val);
