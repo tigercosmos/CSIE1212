@@ -457,11 +457,12 @@ int who_win(int depth, ull board, GameTurn turn, int alpha, int beta,
 
 int main(int argc, char *argv[]) {
   int games;
+  GameTurn turn;
+  int round;
+  ull board;
   cin >> games;
   for (int i = 0; i < games; i++) {
-    ull board = input_game();
-    GameTurn turn;
-    int round;
+    board = input_game();
     get_round(board, &turn, &round);
     int result_val = who_win(0, board, turn, -INF, +INF, round);
     print_win(result_val);
