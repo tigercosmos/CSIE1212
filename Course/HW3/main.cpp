@@ -104,6 +104,23 @@ unordered_map<string, int> final_table = {
     {"XXXOX", -5300}, {"XXOXX", -5300}, {"XOXXX", -5300}, {"OXXXX", -5300},
 };
 
+void print_board(ull board) {
+  for (int row = 0; row < 5; row++) {
+    for (int col = 0; col < 5; col++) {
+      ull tmp = 1;
+      tmp <<= col * 2 + 10 * row;
+      if (board & tmp) {
+        cout << "O";
+      } else if (board & tmp << 1) {
+        cout << "X";
+      } else {
+        cout << ".";
+      }
+    }
+    cout << endl;
+  }
+}
+
 void print_win(int val) {
   if (val < -4000) {
     cout << "X win" << endl;
@@ -262,6 +279,11 @@ int evaluate(ull *board, bool isFinal) {
       if (search != final_table.end()) {
         value += search->second;
       }
+    }
+    if (value > 0) {
+      value = 5000;
+    } else if (value < 0) {
+      value = -5000;
     }
   } else {
     for (int i = 0; i < lines.size(); i++) {
