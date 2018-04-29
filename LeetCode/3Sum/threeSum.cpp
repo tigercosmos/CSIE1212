@@ -52,8 +52,8 @@ public:
               int tmp[3] = {nums[k], nums[i], nums[it->second]};
               sort(tmp, tmp + 3);
               ans.assign(tmp, tmp + 3);
-              string key = to_string(tmp[0]) + to_string(tmp[1]);
-              answer_map.emplace(key, ans);
+              string&& key = to_string(tmp[0]) + to_string(tmp[1]);
+              answer_map.emplace(key, move(ans));
             }
           }
         }
