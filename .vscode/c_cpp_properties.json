@@ -1,5 +1,6 @@
 {
-    "configurations": [{
+    "configurations": [
+        {
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}",
@@ -62,5 +63,5 @@
             }
         }
     ],
-    "version": 3
+    "version": 4
 }
