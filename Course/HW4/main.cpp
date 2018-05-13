@@ -90,7 +90,6 @@ int main(int argc, char *argv[]) {
     } else {
       origin_string.insert(0, prefix_string);
       origin_string += suffix_string;
-      cout << origin_string <<endl;
       cout << roll_hash(target_string, origin_string) << "\n";
       prefix_string = "";
       suffix_string = "";
