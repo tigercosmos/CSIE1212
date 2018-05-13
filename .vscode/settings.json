@@ -34,7 +34,8 @@
         "*.tcc": "cpp",
         "array": "cpp",
         "limits": "cpp",
-        "optional": "cpp"
+        "optional": "cpp",
+        "new": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }
