@@ -1,17 +1,10 @@
 /*
 ** Liu, An-Chi @ Copyright
 */
-#include <algorithm>
-#include <bitset>
 #include <cmath>
-#include <deque>
-#include <functional>
 #include <iostream>
 #include <map>
-#include <new>
 #include <string>
-#include <unordered_map>
-#include <vector>
 using namespace std;
 
 // #define debug
@@ -62,6 +55,7 @@ inline long long get_power(const int len) {
   return move(power);
 }
 
+// 暴力比對：製造正確答案
 int compare() {
   int count = 0;
 #ifdef debug
@@ -250,8 +244,9 @@ int main(int argc, char *argv[]) {
       roll_hash_map_back();
     } else {
       cin >> target_string;
+      // cout << compare() << '\n';
       if (target_string.length() > 10) {
-        cout << roll_hash() << "\n";
+        cout << roll_hash() << '\n';
       } else {
         auto search = hash_map.find(make_hash(target_string));
         if (search != hash_map.end()) {

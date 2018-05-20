@@ -19,4 +19,9 @@ test3:
 	make
 	gtime -f "%Us %MkB" ./a.out < ./test/3.in > tmp.out
 	diff tmp.out ./test/3.out
+
+test4:
+	make
+	gtime -f "%Us %MkB" ./a.out < ./test/4.in > tmp.out
+	diff tmp.out ./test/4.out
 	
