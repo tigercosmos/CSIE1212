@@ -14,8 +14,8 @@ const unsigned PRIME_MOD = 1000000007;
 
 map<long long, int> hash_map;
 
-char origin_string[200000];
-int front = 100000, back = 100000 - 1;
+char origin_string[300000];
+int front = 150000, back = 150000 - 1;
 string target_string;
 
 #ifdef debug
