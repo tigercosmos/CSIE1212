@@ -13,9 +13,13 @@ run3:
 	make
 	./a.out < ./test/3.in
 
+run4:
+	make
+	time -f "%Us %MkB" ./a.out < ./test/4.in
+
 test1:
 	make
-	./a.out < ./test/1.in > tmp.out
+	time -f "%Us %MkB" ./a.out < ./test/1.in > tmp.out
 	diff tmp.out ./test/1.out
 
 test2:
