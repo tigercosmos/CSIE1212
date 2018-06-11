@@ -16,6 +16,7 @@ struct Obj {
   int val;
   int pos;
   int num;
+  int trace;
 };
 
 #ifdef debug
@@ -49,6 +50,14 @@ void print(vector<vector<Obj>> &vv) {
     cout << "num: ";
     for (int j = 0; j < vv[i].size(); j++) {
       cout << vv[i][j].num;
+      if (j != vv[i].size() - 1) {
+        cout << ' ';
+      }
+    }
+    cout << '\n';
+    cout << "trace: ";
+    for (int j = 0; j < vv[i].size(); j++) {
+      cout << vv[i][j].trace;
       if (j != vv[i].size() - 1) {
         cout << ' ';
       }
@@ -91,7 +100,7 @@ void LIS(vector<int> &s) {
   vector<Obj> stack;
   if (s.size() == 0)
     return;
-  stack.push_back({0, s[0], 0, 1});
+  stack.push_back({0, s[0], 1, 1, 0});
   stacks.push_back(stack);
 
 #ifdef debug
@@ -106,24 +115,31 @@ void LIS(vector<int> &s) {
     int stacks_size = stacks.size();
     for (int row = stacks_size - 1; row >= 0; row--) {
       int num = 0;
+      int trace = 5001;
+      int minPos = 5001;
       for (int col = 0; col < stacks[row].size(); col++) {
         if (stacks[row][col].val <= n) {
           num += stacks[row][col].num;
+          num %= MOD;
+          if (stacks[row][col].pos < minPos) {
+            minPos = stacks[row][col].pos;
+            trace = stacks[row][col].trace;
+          }
         }
       }
 
       if (num > 0) {
         if (stacks.size() == stacks_size && row == stacks_size - 1) {
           stack.clear();
-          stack.push_back({row + 1, n, i, num});
+          stack.push_back({row + 1, n, i + 1, num, trace});
           stacks.push_back(stack);
         } else {
-          stacks[row + 1].push_back({row + 1, n, i, num});
+          stacks[row + 1].push_back({row + 1, n, i + 1, num, trace});
         }
         break;
       }
       if (row == 0) {
-        stacks[row].push_back({row, n, i, 1});
+        stacks[row].push_back({row, n, i + 1, 1, i});
       }
     }
 #ifdef debug
@@ -134,8 +150,26 @@ void LIS(vector<int> &s) {
   for (int i = 0; i < stacks.back().size(); i++) {
     total += stacks.back()[i].num;
   }
+  vector<int> vec;
+  int tr = stacks.back()[0].trace;
+  vec.push_back(stacks.back()[0].pos);
+  for (int row = stacks.size() - 2; row >= 0; row--) {
+    for (int col = 0; col < stacks[row].size(); col++) {
+      if (stacks[row][col].trace == tr) {
+        vec.push_back(stacks[row][col].pos);
+        break;
+      }
+    }
+  }
   cout << max << '\n';
   cout << total << '\n';
+  for (int i = vec.size() - 1; i >= 0; i--) {
+    cout << vec[i];
+    if (i != 0) {
+      cout << ' ';
+    }
+  }
+  cout << '\n';
 }
 
 int main(int argc, char *argv[]) {
