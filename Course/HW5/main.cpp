@@ -39,14 +39,14 @@ void print(vector<vector<Obj>> &vv) {
       }
     }
     cout << '\n';
-    // cout << "pos: ";
-    // for (int j = 0; j < vv[i].size(); j++) {
-    //   cout << vv[i][j].pos;
-    //   if (j != vv[i].size() - 1) {
-    //     cout << ' ';
-    //   }
-    // }
-    // cout << '\n';
+    cout << "pos: ";
+    for (int j = 0; j < vv[i].size(); j++) {
+      cout << vv[i][j].pos;
+      if (j != vv[i].size() - 1) {
+        cout << ' ';
+      }
+    }
+    cout << '\n';
     cout << "num: ";
     for (int j = 0; j < vv[i].size(); j++) {
       cout << vv[i][j].num;
@@ -151,11 +151,16 @@ void LIS(vector<int> &s) {
     total += stacks.back()[i].num;
   }
   vector<int> vec;
-  int tr = stacks.back()[0].trace;
+  int tr = 5001;
+  for (int col = 0; col < stacks.back().size(); col++) {
+    tr = min(stacks.back()[col].trace, tr);
+  }
+  int lastVal = stacks.back()[0].val;
   vec.push_back(stacks.back()[0].pos);
   for (int row = stacks.size() - 2; row >= 0; row--) {
     for (int col = 0; col < stacks[row].size(); col++) {
-      if (stacks[row][col].trace == tr) {
+      if (stacks[row][col].trace == tr && stacks[row][col].val <= lastVal) {
+        lastVal = stacks[row][col].val;
         vec.push_back(stacks[row][col].pos);
         break;
       }
