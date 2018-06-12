@@ -9,7 +9,7 @@
 using namespace std;
 #define MOD 1000000007
 
-// #define debug
+#define debug
 
 struct Obj {
   int row;
@@ -17,6 +17,7 @@ struct Obj {
   int pos;
   int num;
   int trace;
+  int last;
 };
 
 #ifdef debug
@@ -62,6 +63,14 @@ void print(vector<vector<Obj>> &vv) {
         cout << ' ';
       }
     }
+    cout << '\n';
+    cout << "last: ";
+    for (int j = 0; j < vv[i].size(); j++) {
+      cout << vv[i][j].last;
+      if (j != vv[i].size() - 1) {
+        cout << ' ';
+      }
+    }
     cout << "\n-\n";
   }
 }
@@ -77,6 +86,16 @@ void print(vector<int> &v) {
 }
 #endif
 
+void print_rev(vector<int> &vec) {
+  for (int i = vec.size() - 1; i >= 0; i--) {
+    cout << vec[i];
+    if (i != 0) {
+      cout << ' ';
+    }
+  }
+  cout << '\n';
+}
+
 void print(vector<Obj> &v) {
   for (int i = 0; i < v.size(); i++) {
     cout << v[i].pos;
@@ -85,6 +104,24 @@ void print(vector<Obj> &v) {
     }
   }
   cout << '\n';
+}
+
+int choose_min(vector<vector<int>> &answers) {
+  for (int i = answers[0].size() - 1; i >= 0; i--) {
+    vector<int> tmp;
+    for (int j = 0; j < answers.size(); j++) {
+      tmp.push_back(answers[j][i]);
+    }
+    sort(tmp.begin(), tmp.end());
+    if (tmp[0] != tmp[1]) {
+      for (int j = 0; j < answers.size(); j++) {
+        if (tmp[0] == answers[j][i]) {
+          return j;
+        }
+      }
+    }
+  }
+  return 0;
 }
 
 bool cmp(Obj const &a, Obj const &b) { return a.val < b.val; }
@@ -100,7 +137,7 @@ void LIS(vector<int> &s) {
   vector<Obj> stack;
   if (s.size() == 0)
     return;
-  stack.push_back({0, s[0], 1, 1, 0});
+  stack.push_back({0, s[0], 1, 1, 0, -1});
   stacks.push_back(stack);
 
 #ifdef debug
@@ -131,15 +168,15 @@ void LIS(vector<int> &s) {
       if (num > 0) {
         if (stacks.size() == stacks_size && row == stacks_size - 1) {
           stack.clear();
-          stack.push_back({row + 1, n, i + 1, num, trace});
+          stack.push_back({row + 1, n, i + 1, num, trace, minPos});
           stacks.push_back(stack);
         } else {
-          stacks[row + 1].push_back({row + 1, n, i + 1, num, trace});
+          stacks[row + 1].push_back({row + 1, n, i + 1, num, trace, minPos});
         }
         break;
       }
       if (row == 0) {
-        stacks[row].push_back({row, n, i + 1, 1, i});
+        stacks[row].push_back({row, n, i + 1, 1, i, -1});
       }
     }
 #ifdef debug
@@ -150,31 +187,43 @@ void LIS(vector<int> &s) {
   for (int i = 0; i < stacks.back().size(); i++) {
     total += stacks.back()[i].num;
   }
-  vector<int> vec;
+  vector<vector<int>> answers;
   int tr = 5001;
+  // from the last row to find which line can get the result
   for (int col = 0; col < stacks.back().size(); col++) {
     tr = min(stacks.back()[col].trace, tr);
   }
-  int lastVal = stacks.back()[0].val;
-  vec.push_back(stacks.back()[0].pos);
-  for (int row = stacks.size() - 2; row >= 0; row--) {
-    for (int col = 0; col < stacks[row].size(); col++) {
-      if (stacks[row][col].trace == tr && stacks[row][col].val <= lastVal) {
-        lastVal = stacks[row][col].val;
-        vec.push_back(stacks[row][col].pos);
-        break;
+
+#ifdef debug
+  cout << "All Possible line:\n";
+#endif
+  // from the last row to trace all possible lines
+  for (int col = 0; col < stacks.back().size(); col++) {
+    if (stacks.back()[col].trace == tr) {
+      // trace the line
+      vector<int> tmp;
+      tmp.push_back(stacks.back()[col].pos);
+      for (int row = stacks.size() - 1; row > 0; row--) {
+        for (int col = 0; col < stacks[row].size(); col++) {
+          if (stacks[row][col].trace == tr &&
+              stacks[row][col].pos == tmp.back()) {
+            tmp.push_back(stacks[row][col].last);
+            break;
+          }
+        }
       }
+      answers.push_back(tmp);
+#ifdef debug
+      print_rev(tmp);
+#endif
     }
   }
+
+  int c = choose_min(answers);
+
   cout << max << '\n';
   cout << total << '\n';
-  for (int i = vec.size() - 1; i >= 0; i--) {
-    cout << vec[i];
-    if (i != 0) {
-      cout << ' ';
-    }
-  }
-  cout << '\n';
+  print_rev(answers[c]);
 }
 
 int main(int argc, char *argv[]) {

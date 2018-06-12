@@ -51,7 +51,8 @@
         "iomanip": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "deque": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
 }
